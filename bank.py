@@ -7,6 +7,7 @@ class BankManager(object):
     def __init__(self):
         self.bank_list = BANK_LIST
         self.bank_cache = {}
+        self._central_bank = None
 
     def get_bank_by_id(self, bank_id):
         if bank_id not in self.bank_list:
@@ -17,6 +18,11 @@ class BankManager(object):
 
         return self.bank_cache[bank_id]
 
+    def get_central_bank(self):
+        if not self._central_bank:
+            self._central_bank = Bank('central_bank')
+        return self._central_bank
+
 bank_manager = BankManager()
 
 class Bank(object):
@@ -24,12 +30,12 @@ class Bank(object):
 
     def __init__(self, bank_id):
         self.bank_id = bank_id
-        self.priv = gcoin_lib.sha256(bank_id)
+        self.priv = gcoin_lib.encode_privkey(gcoin_lib.sha256(bank_id), 'wif_compressed')
         self.pub = gcoin_lib.privtopub(self.priv)
         self.address = gcoin_lib.pubtoaddr(self.pub)
         self.gcoin = GcoinPresenter()
 
-    def send_to(self, bank_to, amount, color, comment):
+    def send_to(self, bank_to, amount, color, comment=''):
         raw_tx = self.gcoin.create_raw_tx(self.address, bank_to.address, amount, color, comment)
         signed_tx = gcoin_lib.signall(raw_tx, self.priv)
         return self.gcoin.send_raw_tx(signed_tx)
