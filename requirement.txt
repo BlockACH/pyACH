@@ -1,0 +1,2 @@
+gcoin
+gcoin-rpc
