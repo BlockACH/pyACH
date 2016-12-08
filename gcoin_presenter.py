@@ -1,4 +1,5 @@
 import gcoin
+from decimal import Decimal
 from gcoinrpc import connect_to_remote
 from config import GCOIN_RPC, BANK_LIST
 
@@ -61,26 +62,32 @@ class GcoinPresenter(object):
         if color != 1:
             inputs = select_utxo(utxos=utxos, color=color, sum=amount)
             fee_inputs = select_utxo(utxos=utxos, color=1, sum=1, exclude=inputs)
+            if not inputs:
+                raise Exception('not enough balance')
+            if not fee_inputs:
+                raise Exception('not enough fee balance')
             inputs.extend(fee_inputs)
         else:
             inputs = select_utxo(utxos=utxos, color=color, sum=amount + 1)
-
-        if not inputs:
-            raise Exception('not enough balance')
+            if not inputs:
+                raise Exception('not enough balance')
 
         outs = [{
             'address': address_to,
-            'value': int(amount * 10**8),
+            'value': int(Decimal(str(amount)) * 10**8),
             'color': color
         }]
 
         inputs_balance = balance_from_utxos(inputs)
         for input_color in inputs_balance:
-            change_amount = inputs_balance[input_color]
+            change_amount = Decimal(str(inputs_balance[input_color]))
+
             if input_color == color:
-                change_amount -= amount
+                change_amount = change_amount - Decimal(str(amount))
+
             if input_color == 1:
-                change_amount -= 1
+                change_amount = change_amount - 1
+            
             if change_amount:
                 outs.append({
                     'address': address_from,

@@ -37,8 +37,16 @@ class Bank(object):
 
     def send_to(self, bank_to, amount, color, comment=''):
         raw_tx = self.gcoin.create_raw_tx(self.address, bank_to.address, amount, color, comment)
+        print 'raw tx done...'
         signed_tx = gcoin_lib.signall(raw_tx, self.priv)
-        return self.gcoin.send_raw_tx(signed_tx)
+        print 'sign tx done...'
+        try:
+            tx_id = self.gcoin.send_raw_tx(signed_tx)
+            return tx_id
+        except Exception as e:
+            print 'QQ:', e.__dict__
+            print signed_tx
+            raise e
 
     @property
     def balance(self):
