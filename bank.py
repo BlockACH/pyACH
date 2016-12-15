@@ -48,6 +48,9 @@ class Bank(object):
             print signed_tx
             raise e
 
+    def merge_tx_in(self, color, div=50):
+        self.gcoin.merge_tx_in(self.address, color, self.priv, div)
+
     @property
     def balance(self):
         return self.gcoin.get_address_balance(self.address)

@@ -56,6 +56,39 @@ class GcoinPresenter(object):
     def send_raw_tx(self, raw_tx):
         return self.rpc_conn.sendrawtransaction(raw_tx)
 
+    def merge_tx_in(self, address, color, priv, div=50):
+        if color == 1:
+            raise Exception('Not support to merge color 1')
+
+        utxos = self.rpc_conn.gettxoutaddress(address)
+        color_utxos = [] if not utxos else [utxo for utxo in utxos if utxo['color'] == color]
+
+        while len(color_utxos) > div:
+            print 'REMAINING {} txins....'.format(len(color_utxos))
+            inputs = color_utxos[0:div]
+            fee_inputs = select_utxo(utxos=utxos, color=1, sum=1, exclude=inputs)
+            inputs.extend(fee_inputs)
+            inputs_balance = balance_from_utxos(inputs)
+            outs = []
+            for input_color in inputs_balance:
+                change_amount = Decimal(str(inputs_balance[input_color]))
+
+                if input_color == 1:
+                    change_amount = change_amount - 1
+
+                if change_amount:
+                    outs.append({
+                        'address': address,
+                        'value': int(change_amount * 10**8),
+                        'color': input_color
+                    })
+            ins = [utxo_to_txin(utxo) for utxo in inputs]
+            raw_tx = gcoin.make_raw_tx(ins, outs)
+            signed_tx = gcoin.signall(raw_tx, priv, parallel=True)
+            self.send_raw_tx(signed_tx)
+            utxos = self.rpc_conn.gettxoutaddress(address)
+            color_utxos = [utxo for utxo in utxos if utxo['color'] == color]
+
     def create_raw_tx(self, address_from, address_to, amount, color, comment=''):
         utxos = self.rpc_conn.gettxoutaddress(address_from)
 
@@ -87,7 +120,7 @@ class GcoinPresenter(object):
 
             if input_color == 1:
                 change_amount = change_amount - 1
-            
+
             if change_amount:
                 outs.append({
                     'address': address_from,
@@ -106,3 +139,34 @@ class GcoinPresenter(object):
 
         ins = [utxo_to_txin(utxo) for utxo in inputs]
         return gcoin.make_raw_tx(ins, outs, tx_type)
+
+    def create_license(self, address, color):
+        license = {
+            'name': 'name',
+            'description': 'description',
+            'issuer': 'none',
+            'fee_collector': 'none',
+            'member_control': False,
+            'metadata_link': 'www.www.com',
+            'upper_limit': 0,
+        }
+
+        license_hex = gcoin.encode_license(license)
+        return self.rpc_conn.sendlicensetoaddress(address, color, license_hex)
+
+    def mint(self, amount, color):
+        return self.rpc_conn.mint(amount, color)
+
+    def send_to_address(self, address, amount, color):
+        return self.rpc_conn.sendtoaddress(address, amount, color)
+
+    def get_fixed_address(self):
+        return self.rpc_conn.proxy.getfixedaddress()
+
+    def is_license_exist(self, color):
+        try:
+            self.rpc_conn.getlicenseinfo(color)
+        except Exception:
+            return False
+        else:
+            return True
