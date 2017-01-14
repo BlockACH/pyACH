@@ -5,9 +5,9 @@ import json
 from pymongo import MongoClient
 from gcoin_presenter import GcoinPresenter
 from bank import BankManager, Bank
+from config import ASTAR_MONGO_URI
 
-uri = "mongodb://ach.csie.org:27017/ach"
-astar_mongo = MongoClient(uri)
+astar_mongo = MongoClient(ASTAR_MONGO_URI)
 db = astar_mongo['ach']
 
 BTC_NUM = 10**8
