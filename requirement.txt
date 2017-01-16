@@ -1,3 +1,4 @@
 gcoin
 gcoin-rpc
 pymongo
+git+https://github.com/StanleyDing/python-bitcoinlib.git
