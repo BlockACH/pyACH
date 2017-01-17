@@ -64,7 +64,7 @@ class GcoinPresenter(object):
         color_utxos = [] if not utxos else [utxo for utxo in utxos if utxo['color'] == color]
 
         while len(color_utxos) > div:
-            print 'REMAINING {} txins....'.format(len(color_utxos))
+            print ('REMAINING {} txins....'.format(len(color_utxos)))
             inputs = color_utxos[0:div]
             fee_inputs = select_utxo(utxos=utxos, color=1, sum=1, exclude=inputs)
             inputs.extend(fee_inputs)

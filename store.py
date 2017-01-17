@@ -51,11 +51,10 @@ with open('../data/ach/txdata_bc_10506_TDES_20161005111019.csv', 'rb') as csvfil
         if count % 20000 == 0:
             result = bulk.execute()
             bulk = db.pythonTransactions.initialize_ordered_bulk_op()
-            print count
-            print json.dumps(result, indent=4)
+            print (count)
+            print (json.dumps(result, indent=4))
             count = 0
     if count > 0:
         result = bulk.execute()
-        print count
-        print json.dumps(result, indent=4)
-
+        print (count)
+        print (json.dumps(result, indent=4))
