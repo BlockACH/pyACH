@@ -1,15 +1,17 @@
+import json
 import time
 
 from pymongo import MongoClient
 from gcoin_presenter import GcoinPresenter
 from bank import BankManager, Bank
 from config import ASTAR_MONGO_URI
+from bson.json_util import dumps
 
 BTC_NUM = 10**8
 
 astar_mongo = MongoClient(ASTAR_MONGO_URI)
 db = astar_mongo['ach']
-collection = db['pythonTransactions']
+collection = db['txs']
 
 previous_day = '01050621'
 current_day = '01050622'
@@ -17,14 +19,26 @@ current_day = '01050622'
 filter = {
     "$or": [
         {
-            "P_TDATE": "01050601"
+            "P_TDATE": previous_day
         },
         {
-            "P_TDATE": "01050602",
+            "P_TDATE": current_day,
             "P_TYPE": "N"
         }
     ]
 }
+
+# db.txs.find({
+#     "$or": [
+#         {
+#             "P_TDATE": "01050601"
+#         },
+#         {
+#             "P_TDATE": "01050602",
+#             "P_TYPE": "N"
+#         }
+#     ]
+# }).size()
 
 txs = collection.find(filter, no_cursor_timeout=True)
 print ('r size: {}'.format(txs.count()))
@@ -37,7 +51,7 @@ for tx in txs:
     p_bank = Bank.manager.get_bank_by_id(str(tx['P_PBANK'][:3]))
     r_bank = Bank.manager.get_bank_by_id(str(tx['P_RBANK'][:3]))
     amount = float(tx['P_AMT']) / BTC_NUM
-    #signed_tx = pBank.send_to(rBank, float(tx['P_AMT'])/BTC_NUM, 2, 'pymongo yo')
+    # signed_tx = pBank.send_to(rBank, float(tx['P_AMT'])/BTC_NUM, 2, 'pymongo yo')
     print ('------------- COUNT: {} -------------'.format(count))
     if count % 5000 == 0:
         print ('Took {} seconds.'.format(time.time() - start))
@@ -48,6 +62,7 @@ for tx in txs:
         print ('[DONE] MERGING INPUTS...')
 
     print ('PBANK: {}, RBANK: {}, AMOUNT: {}'.format(p_bank.bank_id, r_bank.bank_id, amount))
+    # print ('TX: {}'.format(dumps(tx, indent=4)))
     if tx['P_TDATE'] == previous_day:
         if tx['P_TYPE'] == 'N' and tx['P_TXTYPE'] == 'SD':
             r_bank.send_to(p_bank, amount, 2, 'prev N SD')

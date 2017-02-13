@@ -12,6 +12,7 @@ def reset_bank_balance(bank):
     central_bank = Bank.manager.get_central_bank()
     balance = bank.balance
     diff = float(balance.get(2, 0) - RESET_BALANCE)
+    
     if diff < 0:
         print ('CASE 1:', central_bank.send_to(bank, -1*diff, CLEAN_COLOR))
     elif diff > 0:

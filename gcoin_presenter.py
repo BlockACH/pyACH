@@ -166,7 +166,10 @@ class GcoinPresenter(object):
     def is_license_exist(self, color):
         try:
             self.rpc_conn.getlicenseinfo(color)
-        except Exception:
+        except Exception as e:
+            import traceback
+            print (traceback.print_exc()) 
+            print ('getlicenseinfo error: {}'.format(e))
             return False
         else:
             return True
