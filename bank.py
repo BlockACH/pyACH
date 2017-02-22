@@ -36,16 +36,18 @@ class Bank(object):
         self.gcoin = GcoinPresenter()
 
     def send_to(self, bank_to, amount, color, comment=''):
-        raw_tx = self.gcoin.create_raw_tx(self.address, bank_to.address, amount, color, comment)
-        print 'raw tx done...'
-        signed_tx = gcoin_lib.signall(raw_tx, self.priv)
-        print 'sign tx done...'
+        # raw_tx = self.gcoin.create_raw_tx(self.address, bank_to.address, amount, color,  self.priv, comment)
+        signed_tx = self.gcoin.create_raw_tx_and_signed(self.address, bank_to.address, amount, color,  self.priv, comment)
+        # print ('raw_tx: {}'.format(raw_tx))
+        # print ('raw tx done...')
+        # signed_tx = gcoin_lib.signall(raw_tx, self.priv)
+        print ('sign tx done...')
         try:
             tx_id = self.gcoin.send_raw_tx(signed_tx)
             return tx_id
         except Exception as e:
-            print 'QQ:', e.__dict__
-            print signed_tx
+            print ('QQ:', e.__dict__)
+            print (signed_tx)
             raise e
 
     def merge_tx_in(self, color, div=50):
@@ -60,8 +62,5 @@ def test():
     b2 = Bank.manager.get_bank_by_id('EA0')
     for bank_id in BANK_LIST:
         b = Bank.manager.get_bank_by_id(bank_id)
-        print b.address, b.balance
+        print (b.address, b.balance)
     #print b1.send_to(b2, 10, 1, 'wow')
-
-
-    

@@ -15,3 +15,5 @@ BANK_LIST = [
     '1F6', 'B30', '6D4', 'FB4', '4AD', '940', '838',
     'E15', 'F8E', '717', 'C72', '882', 'EA0'
 ]
+
+ASTAR_MONGO_URI = 'mongodb://blockach:boolafish@ach.csie.org:27017/ach'
