@@ -11,10 +11,10 @@ BTC_NUM = 10**8
 
 astar_mongo = MongoClient(ASTAR_MONGO_URI)
 db = astar_mongo['ach']
-collection = db['txs']
+collection = db['pythonTransactions']
 
-previous_day = '01050621'
-current_day = '01050622'
+previous_day = '01050601'
+current_day = '01050602'
 
 filter = {
     "$or": [
@@ -50,6 +50,7 @@ for tx in txs:
     # p_bank, r_bank, amount = tx
     p_bank = Bank.manager.get_bank_by_id(str(tx['P_PBANK'][:3]))
     r_bank = Bank.manager.get_bank_by_id(str(tx['P_RBANK'][:3]))
+    p_tdate = str(tx['P_TDATE'])
     amount = float(tx['P_AMT']) / BTC_NUM
     # signed_tx = pBank.send_to(rBank, float(tx['P_AMT'])/BTC_NUM, 2, 'pymongo yo')
     print ('------------- COUNT: {} -------------'.format(count))
@@ -61,8 +62,8 @@ for tx in txs:
             bank.merge_tx_in(color=2, div=20)
         print ('[DONE] MERGING INPUTS...')
 
-    print ('PBANK: {}, RBANK: {}, AMOUNT: {}'.format(p_bank.bank_id, r_bank.bank_id, amount))
-    # print ('TX: {}'.format(dumps(tx, indent=4)))
+    print ('PBANK: {}, RBANK: {}, AMOUNT: {}, P_TDATE: {}'.format(p_bank.bank_id, r_bank.bank_id, amount, p_tdate))
+    print ('transaction: {}'.format(dumps(tx, indent=4)))
     if tx['P_TDATE'] == previous_day:
         if tx['P_TYPE'] == 'N' and tx['P_TXTYPE'] == 'SD':
             r_bank.send_to(p_bank, amount, 2, 'prev N SD')

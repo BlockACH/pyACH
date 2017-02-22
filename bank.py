@@ -36,9 +36,11 @@ class Bank(object):
         self.gcoin = GcoinPresenter()
 
     def send_to(self, bank_to, amount, color, comment=''):
-        raw_tx = self.gcoin.create_raw_tx(self.address, bank_to.address, amount, color, comment)
-        print ('raw tx done...')
-        signed_tx = gcoin_lib.signall(raw_tx, self.priv)
+        # raw_tx = self.gcoin.create_raw_tx(self.address, bank_to.address, amount, color,  self.priv, comment)
+        signed_tx = self.gcoin.create_raw_tx_and_signed(self.address, bank_to.address, amount, color,  self.priv, comment)
+        # print ('raw_tx: {}'.format(raw_tx))
+        # print ('raw tx done...')
+        # signed_tx = gcoin_lib.signall(raw_tx, self.priv)
         print ('sign tx done...')
         try:
             tx_id = self.gcoin.send_raw_tx(signed_tx)

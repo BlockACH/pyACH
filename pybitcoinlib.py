@@ -19,6 +19,7 @@ import sys
 #     sys.exit(1)
 
 import hashlib
+import gcoin as pygcoinlib
 
 from bitcoin import SelectParams
 from bitcoin.core import b2x, lx, COIN, COutPoint, CMutableTxOut, CMutableTxIn, CMutableTransaction, Hash160
@@ -28,11 +29,43 @@ from bitcoin.wallet import CBitcoinAddress, CBitcoinSecret
 
 SelectParams('mainnet')
 
-# def sign_p2pkh()
+def make_signed_tx(ins, outs, priv):
+	print ('####### in make_signed_tx #######')
+	print('ins: {}'.format(ins))
+	print('outs: {}'.format(outs))
+	print('priv: {}'.format(priv))
+	txins = []
+	txouts = []
+	txin_scriptPubKeys = []
+	# txin_scriptPubKeys = []
+	for i, inp in enumerate(ins):
+		print('inp[tx_id]: {}'.format(inp['tx_id']))
+		txin = CMutableTxIn(COutPoint(lx(inp['tx_id']), inp['index']))
+		seckey = CBitcoinSecret.from_secret_bytes(pygcoinlib.script_to_address(inp['script']).encode('utf-8'))
+		txin_scriptPubKeys.append(CScript([OP_DUP, OP_HASH160, Hash160(seckey.pub), OP_EQUALVERIFY, OP_CHECKSIG]))
+		# txin_scriptPubKeys.append(CScript([OP_DUP, OP_HASH160, Hash160(seckey.pub), OP_EQUALVERIFY, OP_CHECKSIG]))
+		txins.append(txin)
+	for o, out in enumerate(outs):
+		# print('out[\'address\']: {}'.format(out['address']))
+		if 'script' in out:
+			# txouts.append(CMutableTxOut(0, CScript([bytes(out['script'], encoding='UTF-8')]), 2))
+			print('song')
+		else:
+			txouts.append(CMutableTxOut(out['value'], CBitcoinAddress(out['address']).to_scriptPubKey(), out['color']))
+		# print('address: {}'.format(pygcoinlib.script_to_address(spk['script'])))
+	tx = CMutableTransaction(txins, txouts)
+	for i, inp in enumerate(ins):
+		sighash = SignatureHash(txin_scriptPubKeys[i], tx, i, SIGHASH_ALL)
+		sig = seckey.sign(sighash) + bytes([SIGHASH_ALL])
+		txins[i].scriptSig = CScript([sig, seckey.pub])
+	# VerifyScript(txin.scriptSig, txin_scriptPubKey, tx, 0, (SCRIPT_VERIFY_P2SH,))
+	return b2x(tx.serialize())
 
 # Create the (in)famous correct brainwallet secret key.
-h = hashlib.sha256(b'correct horse battery staple').digest()
+h = hashlib.sha256(b'48C').digest()
 seckey = CBitcoinSecret.from_secret_bytes(h)
+print ('seckey: {}'.format(seckey))
+print ('seckey.pub: {}'.format(seckey.pub))
 
 # Same as the txid:vout the createrawtransaction RPC call requires
 #
@@ -46,20 +79,22 @@ vout = 0
 # Create the txin structure, which includes the outpoint. The scriptSig
 # defaults to being empty.
 txin = CMutableTxIn(COutPoint(txid, vout))
-
+print ('txin: {}'.format(txin))
 # We also need the scriptPubKey of the output we're spending because
 # SignatureHash() replaces the transaction scriptSig's with it.
 #
 # Here we'll create that scriptPubKey from scratch using the pubkey that
 # corresponds to the secret key we generated above.
 txin_scriptPubKey = CScript([OP_DUP, OP_HASH160, Hash160(seckey.pub), OP_EQUALVERIFY, OP_CHECKSIG])
-
+print ('txin_scriptPubKey: {}'.format(txin_scriptPubKey))
 # Create the txout. This time we create the scriptPubKey from a Bitcoin
 # address.
-txout = CMutableTxOut(0.001*COIN, CBitcoinAddress('1C7zdTfnkzmr13HfA2vNm5SJYRK6nEKyq8').to_scriptPubKey())
+txout = CMutableTxOut(0.001*COIN, CBitcoinAddress('1C7zdTfnkzmr13HfA2vNm5SJYRK6nEKyq8').to_scriptPubKey(), 2)
+print ('txout: {}'.format(txout))
 
 # Create the unsigned transaction.
 tx = CMutableTransaction([txin], [txout])
+print ('tx: {}'.format(tx))
 
 # Calculate the signature hash for that transaction.
 sighash = SignatureHash(txin_scriptPubKey, tx, 0, SIGHASH_ALL)

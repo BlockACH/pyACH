@@ -1,7 +1,9 @@
+import json
 import gcoin
 from decimal import Decimal
 from gcoinrpc import connect_to_remote
 from config import GCOIN_RPC, BANK_LIST
+from pybitcoinlib import make_signed_tx
 
 
 def get_rpc_connection():
@@ -89,9 +91,10 @@ class GcoinPresenter(object):
             utxos = self.rpc_conn.gettxoutaddress(address)
             color_utxos = [utxo for utxo in utxos if utxo['color'] == color]
 
-    def create_raw_tx(self, address_from, address_to, amount, color, comment=''):
+    def create_raw_tx(self, address_from, address_to, amount, color, priv, comment=''):
         utxos = self.rpc_conn.gettxoutaddress(address_from)
-
+        print ('address_from: {}'.format(address_from))
+        print ('utxo: {}'.format(utxos))
         if color != 1:
             inputs = select_utxo(utxos=utxos, color=color, sum=amount)
             fee_inputs = select_utxo(utxos=utxos, color=1, sum=1, exclude=inputs)
@@ -138,7 +141,62 @@ class GcoinPresenter(object):
             tx_type = 5
 
         ins = [utxo_to_txin(utxo) for utxo in inputs]
+        # make_signed_tx(ins, outs, priv)
         return gcoin.make_raw_tx(ins, outs, tx_type)
+
+    def create_raw_tx_and_signed(self, address_from, address_to, amount, color, priv, comment=''):
+        utxos = self.rpc_conn.gettxoutaddress(address_from)
+        print ('address_from: {}'.format(address_from))
+        print ('utxos: {}\n'.format(utxos))
+        if color != 1:
+            inputs = select_utxo(utxos=utxos, color=color, sum=amount)
+            fee_inputs = select_utxo(utxos=utxos, color=1, sum=1, exclude=inputs)
+            if not inputs:
+                raise Exception('not enough balance')
+            if not fee_inputs:
+                raise Exception('not enough fee balance')
+            inputs.extend(fee_inputs)
+        else:
+            inputs = select_utxo(utxos=utxos, color=color, sum=amount + 1)
+            if not inputs:
+                raise Exception('not enough balance')
+
+        outs = [{
+            'address': address_to,
+            'value': int(Decimal(str(amount)) * 10**8),
+            'color': color
+        }]
+
+        inputs_balance = balance_from_utxos(inputs)
+        for input_color in inputs_balance:
+            change_amount = Decimal(str(inputs_balance[input_color]))
+
+            if input_color == color:
+                change_amount = change_amount - Decimal(str(amount))
+
+            if input_color == 1:
+                change_amount = change_amount - 1
+
+            if change_amount:
+                outs.append({
+                    'address': address_from,
+                    'value': int(change_amount * 10**8),
+                    'color': input_color
+                })
+
+        tx_type = 0
+        if comment:
+            outs.append({
+                'script': gcoin.mk_op_return_script(comment.encode('utf8')),
+                'value': 0,
+                'color': 0
+            })
+            tx_type = 5
+        print ('inputs: {}\n'.format(inputs))
+        ins = [utxo_to_txin(utxo) for utxo in inputs]
+        print ('ins: {}\n'.format(ins))
+        return make_signed_tx(ins, outs, priv)
+        # return gcoin.make_raw_tx(ins, outs, tx_type)
 
     def create_license(self, address, color):
         license = {
@@ -168,7 +226,7 @@ class GcoinPresenter(object):
             self.rpc_conn.getlicenseinfo(color)
         except Exception as e:
             import traceback
-            print (traceback.print_exc()) 
+            print (traceback.print_exc())
             print ('getlicenseinfo error: {}'.format(e))
             return False
         else:
