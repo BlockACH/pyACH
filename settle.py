@@ -63,7 +63,7 @@ for tx in txs:
         print ('[DONE] MERGING INPUTS...')
 
     print ('PBANK: {}, RBANK: {}, AMOUNT: {}, P_TDATE: {}'.format(p_bank.bank_id, r_bank.bank_id, amount, p_tdate))
-    print ('transaction: {}'.format(dumps(tx, indent=4)))
+    # print ('transaction: {}'.format(dumps(tx, indent=4)))
     if tx['P_TDATE'] == previous_day:
         if tx['P_TYPE'] == 'N' and tx['P_TXTYPE'] == 'SD':
             r_bank.send_to(p_bank, amount, 2, 'prev N SD')

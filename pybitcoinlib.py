@@ -58,7 +58,7 @@ def make_signed_tx(ins, outs, priv):
 		sighash = SignatureHash(txin_scriptPubKeys[i], tx, i, SIGHASH_ALL)
 		sig = seckey.sign(sighash) + bytes([SIGHASH_ALL])
 		txins[i].scriptSig = CScript([sig, seckey.pub])
-	# VerifyScript(txin.scriptSig, txin_scriptPubKey, tx, 0, (SCRIPT_VERIFY_P2SH,))
+		VerifyScript(txins[i].scriptSig, txin_scriptPubKeys[i], tx, i, (SCRIPT_VERIFY_P2SH,))
 	return b2x(tx.serialize())
 
 # Create the (in)famous correct brainwallet secret key.
