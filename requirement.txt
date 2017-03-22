@@ -1,3 +1,0 @@
-gcoin
-gcoin-rpc
-pymongo
