@@ -1,7 +1,7 @@
 import gcoin
 from decimal import Decimal
 from gcoinrpc import connect_to_remote
-from config import GCOIN_RPC, BANK_LIST
+from config import GCOIN_RPC
 
 
 def get_rpc_connection():
