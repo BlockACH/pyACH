@@ -4,24 +4,25 @@ from models import HistoryTx
 
 
 class HistoryDataPresenter(object):
-    Data = namedtuple(
-        'Data',
-        ['trigger_bank', 'receive_bank', 'type', 'amount']
-    )
 
-    def to_dict_data(self, data_list):
-        return [d._asdict() for d in data_list]
+    def wrapper(self, data):
+        return {
+            'trigger_bank': data['P_PBANK'][:3],
+            'receive_bank': data['P_RBANK'][:3],
+            'tx_type': data['P_TXTYPE'],
+            'amount': float(data['P_AMT'])
+        }
 
     def collect_data(self):
         # TODO: change mock data with real one
-        data_list = [self.Data('AE0', '514', 'SD', 100),
-                     self.Data('AE0', '514', 'SD', 200)]
+        random_data = HistoryTx().get_random_data()
+        return self.wrapper(random_data)
+        # data_list = history_tx.get_random_data()
+        # data_list = [self.Data('AE0', '514', 'SD', 100),
+        #              self.Data('AE0', '514', 'SD', 200)]
 
-        return self.to_dict_data(data_list)
+        # return history_tx.get_random_data()
 
     def pay_data(self):
         # TODO: change mock data with real one
-        data_list = [self.Data('AE0', '514', 'SC', 100),
-                     self.Data('AE0', '514', 'SC', 200)]
-
-        return self.to_dict_data(data_list)
+        return {}

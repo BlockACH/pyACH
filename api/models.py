@@ -19,16 +19,22 @@ class BaseDbModel(object):
 
     def _get_attribute(self, attr_name):
         if hasattr(self, attr_name):
-            return self.__dict__[attr_name]
+            return getattr(self, attr_name)
         else:
             raise AttributeError('`{}` attribute should be defined'.format(attr_name))
 
 
 class HistoryTx(BaseDbModel):
-    db_url = 'mongodb://13.78.116.125:27017/ach'
+    db_url = 'mongodb://ach:graduate@13.78.116.125:27017/ach'
     db_name = 'ach'
     collection_name = 'transactions'
 
+    def get_random_data(self):
+        cursors = self.collection.find(limit=1)
+        return cursors[0]
+
+    def get_collect_data(self):
+        pass
 
 class Tx(BaseDbModel):
     """
