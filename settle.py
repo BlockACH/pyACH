@@ -1,8 +1,7 @@
 import time
 
 from pymongo import MongoClient
-from gcoin_presenter import GcoinPresenter
-from bank import BankManager, Bank
+from bank import Bank
 
 BTC_NUM = 10**8
 
@@ -37,7 +36,7 @@ for tx in txs:
     p_bank = Bank.manager.get_bank_by_id(str(tx['P_PBANK'][:3]))
     r_bank = Bank.manager.get_bank_by_id(str(tx['P_RBANK'][:3]))
     amount = float(tx['P_AMT']) / BTC_NUM
-    #signed_tx = pBank.send_to(rBank, float(tx['P_AMT'])/BTC_NUM, 2, 'pymongo yo')
+    # signed_tx = pBank.send_to(rBank, float(tx['P_AMT'])/BTC_NUM, 2, 'pymongo yo')
     print '------------- COUNT: {} -------------'.format(count)
     if count % 5000 == 0:
         print 'Took {} seconds.'.format(time.time() - start)

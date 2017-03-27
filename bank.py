@@ -62,6 +62,3 @@ def test():
         b = Bank.manager.get_bank_by_id(bank_id)
         print b.address, b.balance
     #print b1.send_to(b2, 10, 1, 'wow')
-
-
-    
