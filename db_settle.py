@@ -2,7 +2,7 @@ import time
 
 from pymongo import MongoClient
 
-uri = 'mongodb://ach:graduate@localhost:27017/ach'
+uri = 'mongodb://ach:graduate@13.78.116.125:27017/ach'
 astar_mongo = MongoClient(uri)
 db = astar_mongo['ach']
 collection = db['transactions']

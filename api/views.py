@@ -9,7 +9,6 @@ app = Flask(__name__)
 def hello():
     return 'Hello World!'
 
-
 @app.route('/history-data/collect', methods=['GET'])
 def history_data_collect():
     presenter = HistoryDataPresenter()
@@ -28,6 +27,13 @@ def history_data_range():
     tx_type = request.args.get('txtype', '')
     presenter = HistoryDataPresenter()
     return jsonify(data=presenter.range_data(start_date, end_date))
+
+@app.route('/settlement/db', methods=['GET'])
+def db_settle():
+    start_date = request.args.get('start', '')
+    end_date = request.args.get('end', '')
+    presenter = HistoryDataPresenter()
+    return jsonify(data=presenter.db_settle(start_date, end_date))
 
 @app.route('/transaction/trigger', methods=['GET', 'POST'])
 def trigger():

@@ -42,6 +42,19 @@ class HistoryTx(BaseDbModel):
     db_name = 'ach'
     collection_name = 'transactions'
 
+    def get_query_dict(self, start_date, end_date):
+        return {
+            '$or': [
+                {
+                    'P_TDATE': end_date
+                },
+                {
+                    'P_TDATE': start_date,
+                    'P_TYPE': 'N'
+                }
+            ]
+        }
+
     def get_random_data(self, tx_type):
         return {
             'P_PBANK': BANK_LIST[random.randint(0, len(BANK_LIST))],
@@ -51,23 +64,13 @@ class HistoryTx(BaseDbModel):
         }
 
     def get_collect_data(self):
-        cursors = self.collection.find()
+        cursor = self.collection.find()
         pass
 
-    def get_range_data(self, start_date, end_date):
-        query = {
-            "$or": [
-                {
-                    "P_TDATE": end_date
-                },
-                {
-                    "P_TDATE": start_date,
-                    "P_TYPE": "N"
-                }
-            ]
-        }
-        cursors = self.collection.find(query, no_cursor_timeout=True)
-        return cursors[0]
+    def get_range_data_cursor(self, start_date, end_date):
+        query = self.get_query_dict(start_date, end_date)
+        cursor = self.collection.find(query, no_cursor_timeout=True)
+        return cursor
 
 class Tx(BaseDbModel):
     db_url = 'mongodb://ach:graduate@13.78.116.125:27017/tx'
