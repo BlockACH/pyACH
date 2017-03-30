@@ -5,7 +5,7 @@ from bank import Bank
 
 BTC_NUM = 10**8
 
-uri = "mongodb://ach.csie.org:27017/ach"
+uri = 'mongodb://ach:graduate@13.78.116.125:27017/ach'
 astar_mongo = MongoClient(uri)
 db = astar_mongo['ach']
 collection = db['transactions']
