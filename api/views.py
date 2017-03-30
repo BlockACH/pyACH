@@ -21,6 +21,13 @@ def history_data_pay():
     presenter = HistoryDataPresenter()
     return jsonify(data=presenter.pay_data())
 
+@app.route('/history-data/range', methods=['GET'])
+def history_data_range():
+    start_date = request.args.get('start', '')
+    end_date = request.args.get('end', '')
+    tx_type = request.args.get('txtype', '')
+    presenter = HistoryDataPresenter()
+    return jsonify(data=presenter.range_data(start_date, end_date))
 
 @app.route('/transaction/trigger', methods=['GET', 'POST'])
 def trigger():

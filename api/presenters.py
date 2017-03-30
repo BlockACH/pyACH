@@ -15,14 +15,12 @@ class HistoryDataPresenter(object):
 
     def collect_data(self):
         # TODO: change mock data with real one
-        random_data = HistoryTx().get_random_data()
+        random_data = HistoryTx().get_random_data('SC')
         return self.wrapper(random_data)
-        # data_list = history_tx.get_random_data()
-        # data_list = [self.Data('AE0', '514', 'SD', 100),
-        #              self.Data('AE0', '514', 'SD', 200)]
-
-        # return history_tx.get_random_data()
 
     def pay_data(self):
         # TODO: change mock data with real one
         return {}
+
+    def range_data(self, start_date, end_date):
+        return self.wrapper(HistoryTx().get_range_data(start_date, end_date))
