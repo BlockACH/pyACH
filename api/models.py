@@ -1,18 +1,6 @@
-from pymongo import MongoClient
 import random
 
-BANK_LIST = [
-    '6AB', 'A28', '46E', 'DD3', '822', 'CCC', '219',
-    '18C', '170', 'B63', '62F', '5E0', '666', '519',
-    'BA4', '5BD', '682', 'E07', 'B31', '0B1', 'FCB',
-    'B89', '101', 'EDB', 'E75', '75D', 'A0D', '22D',
-    'AB5', 'A1D', 'F73', 'C45', '481', '49A', 'EE0',
-    '269', '7BA', '48C', 'E0C', 'CE3', '8DA', '552',
-    '1F6', 'B30', '6D4', 'FB4', '4AD', '940', '838',
-    'E15', 'F8E', '717', 'C72', '882', 'EA0'
-]
-
-TX_TYPE_LIST = ['SC', 'SD']
+from pymongo import MongoClient
 
 class BaseDbModel(object):
 
@@ -41,6 +29,16 @@ class HistoryTx(BaseDbModel):
     db_url = 'mongodb://ach:graduate@13.78.116.125:27017/ach'
     db_name = 'ach'
     collection_name = 'transactions'
+    BANK_LIST = [
+        '6AB', 'A28', '46E', 'DD3', '822', 'CCC', '219',
+        '18C', '170', 'B63', '62F', '5E0', '666', '519',
+        'BA4', '5BD', '682', 'E07', 'B31', '0B1', 'FCB',
+        'B89', '101', 'EDB', 'E75', '75D', 'A0D', '22D',
+        'AB5', 'A1D', 'F73', 'C45', '481', '49A', 'EE0',
+        '269', '7BA', '48C', 'E0C', 'CE3', '8DA', '552',
+        '1F6', 'B30', '6D4', 'FB4', '4AD', '940', '838',
+        'E15', 'F8E', '717', 'C72', '882', 'EA0'
+    ]
 
     def get_query_dict(self, start_date, end_date):
         return {
@@ -62,10 +60,6 @@ class HistoryTx(BaseDbModel):
             'P_TXTYPE': tx_type,
             'P_AMT': random.randint(0, 10) * 1000
         }
-
-    def get_collect_data(self):
-        cursor = self.collection.find()
-        pass
 
     def get_range_data_cursor(self, start_date, end_date):
         query = self.get_query_dict(start_date, end_date)

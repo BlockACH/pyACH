@@ -1,9 +1,7 @@
 from flask import Flask, jsonify, request
-
 from presenters import HistoryDataPresenter
 
 app = Flask(__name__)
-
 
 @app.route('/')
 def hello():
@@ -13,7 +11,6 @@ def hello():
 def history_data_collect():
     presenter = HistoryDataPresenter()
     return jsonify(data=presenter.collect_data())
-
 
 @app.route('/history-data/pay', methods=['GET'])
 def history_data_pay():
