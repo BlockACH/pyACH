@@ -7,8 +7,8 @@ astar_mongo = MongoClient(uri)
 db = astar_mongo['ach']
 collection = db['transactions']
 
-previous_day = '01050531'
-current_day = '01050601'
+previous_day = '01050606'
+current_day = '01050607'
 
 query = {
     "$or": [
