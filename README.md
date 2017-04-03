@@ -15,12 +15,12 @@
 ## Installment
 ```
 $ virtualenv env
+$ source ./env/bin/activate
 $ pip install -r requirements.txt
 $ npm install
 $ sudo npm install -g pm2
 ```
 ## Start server
 ```
-$ source ./env/bin/activate
 $ pm2 start run_server.py
 ```
