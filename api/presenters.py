@@ -1,7 +1,6 @@
 from collections import namedtuple
-
-from models import HistoryTx
-
+from api.models import HistoryTx
+from bank import Bank
 
 class HistoryDataPresenter(object):
 
@@ -15,12 +14,13 @@ class HistoryDataPresenter(object):
 
     def collect_data(self):
         # TODO: change mock data with real one
-        random_data = HistoryTx().get_random_data('SC')
+        random_data = HistoryTx().get_random_data('SD')
         return self.wrapper(random_data)
 
     def pay_data(self):
         # TODO: change mock data with real one
-        return {}
+        random_data = HistoryTx().get_random_data('SC')
+        return self.wrapper(random_data)
 
     def range_data(self, start_date, end_date):
         cursor = HistoryTx().get_range_data_cursor(start_date, end_date)
