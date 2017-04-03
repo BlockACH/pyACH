@@ -7,11 +7,10 @@
 # pyACH [![Semver](http://img.shields.io/SemVer/0.1.3.png)]()
 
 ## Requirement
-```
-python 2.7
-npm 3.10.10
-nodejs 6.9.4
-```
+
+- python 2.7
+- npm 3.10.10
+- nodejs 6.9.4
 
 ## Installment
 ```
