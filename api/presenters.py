@@ -1,5 +1,5 @@
 from collections import namedtuple
-from models import HistoryTx
+from api.models import HistoryTx
 from bank import Bank
 
 class HistoryDataPresenter(object):

@@ -7,10 +7,6 @@ def fetch(url, timeout):
     data = r.json()['args']
     return data
 
-# for i in range(42):
-#     url = 'https://httpbin.org/get?i={0}'.format(i)
-#     print(fetch(url, 60))
-
 with ThreadPoolExecutor(max_workers=10) as executor:
     futures = {}
     for i in range(42):
