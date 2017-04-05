@@ -46,3 +46,9 @@ class HistoryDataPresenter(object):
                     bank_dict[p_bank] = bank_dict.get(p_bank, 0) + amount
 
         return bank_dict
+
+    def bank_address_dict(self):
+        bank_address_dict = {}
+        for b in Bank.manager.bank_list:
+            bank_address_dict[b] = Bank.manager.get_bank_by_id(b).address
+        return bank_address_dict

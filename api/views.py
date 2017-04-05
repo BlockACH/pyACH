@@ -32,6 +32,11 @@ def db_settle():
     presenter = HistoryDataPresenter()
     return jsonify(data=presenter.db_settle(start_date, end_date))
 
+@app.route('/bank/address', methods=['GET'])
+def bank_address():
+    presenter = HistoryDataPresenter()
+    return jsonify(data=presenter.bank_address_dict())
+
 @app.route('/transaction/trigger', methods=['GET', 'POST'])
 def trigger():
     if request.method == 'POST':
