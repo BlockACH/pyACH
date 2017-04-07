@@ -2,6 +2,7 @@ import gcoin as gcoin_lib
 from gcoin_presenter import GcoinPresenter
 from config import BANK_LIST
 
+
 class BankManager(object):
 
     def __init__(self):
@@ -23,7 +24,9 @@ class BankManager(object):
             self._central_bank = Bank('central_bank')
         return self._central_bank
 
+
 bank_manager = BankManager()
+
 
 class Bank(object):
     manager = bank_manager
@@ -55,10 +58,11 @@ class Bank(object):
     def balance(self):
         return self.gcoin.get_address_balance(self.address)
 
+
 def test():
     b1 = Bank.manager.get_bank_by_id('6AB')
     b2 = Bank.manager.get_bank_by_id('EA0')
     for bank_id in BANK_LIST:
         b = Bank.manager.get_bank_by_id(bank_id)
         print b.address, b.balance
-    #print b1.send_to(b2, 10, 1, 'wow')
+    # print b1.send_to(b2, 10, 1, 'wow')
