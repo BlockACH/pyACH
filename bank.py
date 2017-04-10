@@ -1,6 +1,13 @@
 import gcoin as gcoin_lib
+
 from gcoin_presenter import GcoinPresenter
-from config import BANK_LIST
+from config import BANK_LIST, CLEAN_COLOR
+from smart_contract.utils import (create_trade_data,
+                                  create_deploy_data,
+                                  create_mint_data,
+                                  create_clear_queue_data,
+                                  DEFAULT_CONTRACT_ID)
+
 
 
 class BankManager(object):
@@ -38,25 +45,59 @@ class Bank(object):
         self.address = gcoin_lib.pubtoaddr(self.pub)
         self.gcoin = GcoinPresenter()
 
-    def send_to(self, bank_to, amount, color, comment=''):
-        raw_tx = self.gcoin.create_raw_tx(self.address, bank_to.address, amount, color, comment)
-        print 'raw tx done...'
-        signed_tx = gcoin_lib.signall(raw_tx, self.priv)
-        print 'sign tx done...'
-        try:
-            tx_id = self.gcoin.send_raw_tx(signed_tx)
-            return tx_id
-        except Exception as e:
-            print 'QQ:', e.__dict__
-            print signed_tx
-            raise e
+    @property
+    def balance(self):
+        return self.gcoin.get_address_balance(self.address)
+
+    @property
+    def contract_balance(self):
+        # TODO: call smart contract server 'get state' api
+        pass
 
     def merge_tx_in(self, color, div=50):
         self.gcoin.merge_tx_in(self.address, color, self.priv, div)
 
-    @property
-    def balance(self):
-        return self.gcoin.get_address_balance(self.address)
+    def send_to(self, bank_to, amount, color=CLEAN_COLOR, comment=''):
+        """
+        This uses gcoin currency to settle. `amount` should be in BTC.
+        """
+        raw_tx = self.gcoin.create_raw_tx(self.address, bank_to.address, amount, color, comment)
+        return self._sign_and_send_raw_tx(raw_tx)
+
+    def contract_send_to(self, bank_to, amount, comment='', contract_id=DEFAULT_CONTRACT_ID):
+        """
+        This uses smart contract to settle.
+        """
+        contract_data = create_trade_data(self.bank_id, bank_to.bank_id,
+                                          amount, comment, contract_id)
+        raw_tx = self.gcoin.create_raw_tx(self.address, self.address, 1, 1, contract_data)
+        return self._sign_and_send_raw_tx(raw_tx)
+
+    def contract_mint(self, amount, comment='', contract_id=DEFAULT_CONTRACT_ID):
+        contract_data = create_mint_data(self.bank_id, amount, comment, contract_id)
+        raw_tx = self.gcoin.create_raw_tx(self.address, self.address, 1, 1, contract_data)
+        return self._sign_and_send_raw_tx(raw_tx)
+
+    def contract_clear_queue(self, comment='', contract_id=DEFAULT_CONTRACT_ID):
+        contract_data = create_clear_queue_data(comment, contract_id)
+        raw_tx = self.gcoin.create_raw_tx(self.address, self.address, 1, 1, contract_data)
+        return self._sign_and_send_raw_tx(raw_tx)
+
+    def deploy_contract(self, contract_id=DEFAULT_CONTRACT_ID):
+        deploy_data = create_deploy_data(contract_id)
+        raw_tx = self.gcoin.create_raw_tx(self.address, self.address, 1, 1, deploy_data)
+        return self._sign_and_send_raw_tx(raw_tx)
+
+    def _sign_and_send_raw_tx(self, raw_tx):
+        signed_tx = gcoin_lib.signall(raw_tx, self.priv)
+        try:
+            tx_id = self.gcoin.send_raw_tx(signed_tx)
+            return tx_id
+        except Exception as e:
+            print 'SEND_RAW_TX_ERROR:', e.__dict__
+            print signed_tx
+            raise e
+
 
 
 def test():

@@ -170,3 +170,12 @@ class GcoinPresenter(object):
             return False
         else:
             return True
+
+
+class SmartContractPresenter(GcoinPresenter):
+
+    def deploy(self, code):
+        pass
+
+    def trade(self, from_address, to_address, amount):
+        pass

@@ -40,7 +40,7 @@ def main():
     if should_wait_license:
         time.sleep(90)
 
-    gcoin.mint(1000000000, 1)
+    gcoin.mint(2000000000, 1)
     gcoin.mint(1000000000, 2)
     gcoin.send_to_address(central_bank.address, 1000000000, 1)
     gcoin.send_to_address(central_bank.address, 1000000000, 2)

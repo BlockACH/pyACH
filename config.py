@@ -1,8 +1,14 @@
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+SMART_CONTRACT_PATH = os.path.join(BASE_DIR, 'smart_contract')
+
 GCOIN_RPC = {
-    'user': 'gcoin',
-    'password': 'abc123',
-    'host': 'ach.csie.org',
-    'port': '1126',
+    'user': '',
+    'password': '',
+    'host': '',
+    'port': '',
 }
 
 BANK_LIST = [
@@ -15,3 +21,5 @@ BANK_LIST = [
     '1F6', 'B30', '6D4', 'FB4', '4AD', '940', '838',
     'E15', 'F8E', '717', 'C72', '882', 'EA0'
 ]
+
+CLEAN_COLOR = 2
