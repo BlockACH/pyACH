@@ -1,11 +1,22 @@
 from flask import Flask, jsonify, request
 from presenters import HistoryDataPresenter
+from presenters import GcoinPresenter
 
 app = Flask(__name__)
 
 @app.route('/')
 def hello():
     return 'Hello World!'
+
+@app.route('/gcoin/alive', methods=['GET'])
+def is_gcoin_alive():
+    presenter = GcoinPresenter()
+    return jsonify(data=presenter.is_gcoin_alive())
+
+@app.route('/gcoin/clean', methods=['POST'])
+def gcoin_clean():
+    presenter = GcoinPresenter()
+    return jsonify(data=presenter.clean_main_directory())
 
 @app.route('/history-data/collect', methods=['GET'])
 def history_data_collect():

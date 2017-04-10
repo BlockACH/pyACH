@@ -1,6 +1,42 @@
+import subprocess as sub
+import os
+import json
+
 from collections import namedtuple
 from api.models import HistoryTx
 from bank import Bank
+
+class GcoinPresenter(object):
+    def is_gcoin_alive(self):
+        response = {}
+        # TODO rpcccccccccc
+        return response
+
+    def clean_main_directory(self):
+        command_list = ['gcoin-cli', 'stop']
+        response = {}
+        try:
+            p = sub.Popen(command_list, stdout=sub.PIPE, stderr=sub.PIPE)
+            output, errors = p.communicate()
+        except Exception as e:
+            response['status'] = 'failed'
+            response['message'] = str(e)
+            return response
+        else:
+            print 'Stop successfully!'
+
+        main_path = os.path.join(os.path.expanduser('~'), '.gcoin/main')
+        command_list = ['rm', '-rf', main_path]
+        try:
+            p = sub.Popen(command_list, stdout=sub.PIPE, stderr=sub.PIPE)
+            output, errors = p.communicate()
+        except Exception as e:
+            response['status'] = 'failed'
+            response['message'] = str(e)
+        else:
+            response['status'] = 'success'
+            response['message'] = 'Clean successfully!'
+        return response
 
 class HistoryDataPresenter(object):
 
