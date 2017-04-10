@@ -1,7 +1,7 @@
 GCOIN_RPC = {
     'user': 'gcoin',
     'password': 'abc123',
-    'host': 'oss1.diqi.us',
+    'host': 'ach.csie.org',
     'port': '1126',
 }
 
