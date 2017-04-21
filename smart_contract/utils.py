@@ -19,7 +19,7 @@ def create_trade_data(from_address, to_address, amount, comment='',
 
 
 def create_mint_data(address, amount, comment='',
-                     contract_id=DEFAULT_CONTRACT_ID):
+                     contract_id=DEFAULT_CONTRACT_ID, is_confidential=True):
     contract_data = {
         'type': 'RUN_CONTRACT',
         'contract_id': contract_id,

@@ -46,8 +46,9 @@ def utxo_to_txin(utxo):
 
 class GcoinPresenter(object):
 
-    def __init__(self):
-        self.rpc_conn = get_rpc_connection()
+    @property
+    def rpc_conn(self):
+        return get_rpc_connection()
 
     def get_address_balance(self, address):
         utxos = self.rpc_conn.gettxoutaddress(address)

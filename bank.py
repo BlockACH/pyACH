@@ -1,13 +1,13 @@
 import gcoin as gcoin_lib
+from crypto_utils import create_ecc, encrypt
 
-from gcoin_presenter import GcoinPresenter
 from config import BANK_LIST, CLEAN_COLOR
+from gcoin_presenter import GcoinPresenter
 from smart_contract.utils import (create_trade_data,
                                   create_deploy_data,
                                   create_mint_data,
                                   create_clear_queue_data,
                                   DEFAULT_CONTRACT_ID)
-
 
 
 class BankManager(object):
@@ -31,6 +31,11 @@ class BankManager(object):
             self._central_bank = Bank('central_bank')
         return self._central_bank
 
+    def get_tch(self):
+        if not self._tch:
+            self._tch = Bank('tch')
+        return self._tch
+
 
 bank_manager = BankManager()
 
@@ -44,6 +49,8 @@ class Bank(object):
         self.pub = gcoin_lib.privtopub(self.priv)
         self.address = gcoin_lib.pubtoaddr(self.pub)
         self.gcoin = GcoinPresenter()
+        # ECC for confidential tx
+        self.ecc = create_ecc(gcoin_lib.sha256(self.bank_id))
 
     @property
     def balance(self):
@@ -53,6 +60,14 @@ class Bank(object):
     def contract_balance(self):
         # TODO: call smart contract server 'get state' api
         pass
+
+    @property
+    def confidential_tx_priv(self):
+        return self.ecc.get_privkey()
+
+    @property
+    def confidential_tx_pub(self):
+        return self.ecc.get_pubkey()
 
     def merge_tx_in(self, color, div=50):
         self.gcoin.merge_tx_in(self.address, color, self.priv, div)
@@ -70,6 +85,13 @@ class Bank(object):
         """
         contract_data = create_trade_data(self.bank_id, bank_to.bank_id,
                                           amount, comment, contract_id)
+        central_bank = Bank.manager.get_central_bank()
+        pub_keys = [
+            central_bank.confidential_tx_pub,
+            self.confidential_tx_pub,
+            bank_to.confidential_tx_pub
+        ]
+        contract_data = encrypt(contract_data, pub_keys)
         raw_tx = self.gcoin.create_raw_tx(self.address, self.address, 1, 1, contract_data)
         return self._sign_and_send_raw_tx(raw_tx)
 
@@ -97,13 +119,3 @@ class Bank(object):
             print 'SEND_RAW_TX_ERROR:', e.__dict__
             print signed_tx
             raise e
-
-
-
-def test():
-    b1 = Bank.manager.get_bank_by_id('6AB')
-    b2 = Bank.manager.get_bank_by_id('EA0')
-    for bank_id in BANK_LIST:
-        b = Bank.manager.get_bank_by_id(bank_id)
-        print b.address, b.balance
-    # print b1.send_to(b2, 10, 1, 'wow')
