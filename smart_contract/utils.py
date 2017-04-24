@@ -6,6 +6,22 @@ from config import SMART_CONTRACT_PATH
 DEFAULT_CONTRACT_ID = 1
 
 
+def create_reset_data(contract_id, comment=''):
+    """
+    Warning: This is only for conveniently reset data.
+    Do not use in production
+    """
+
+    contract_data = {
+        'type': 'RUN_CONTRACT',
+        'contract_id': contract_id,
+        'function': 'reset',
+        'data': {},
+        'comment': comment,
+    }
+    return json.dumps(contract_data)
+
+
 def create_trade_data(from_address, to_address, amount, comment='',
                       contract_id=DEFAULT_CONTRACT_ID):
     contract_data = {

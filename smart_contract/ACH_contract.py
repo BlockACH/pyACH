@@ -60,3 +60,6 @@ class Contract(object):
 
         state['queue'] = remaining_queue
         return state
+
+    def reset(self, data, state):
+        return self.init_state()

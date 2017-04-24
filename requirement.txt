@@ -2,4 +2,5 @@ gcoin
 gcoin-rpc
 pymongo
 Flask
+requests
 git+https://github.com/BlockACH/crypto_utils@master

@@ -21,12 +21,12 @@ def balance_from_utxos(utxos):
     return balance_dict
 
 
-def select_utxo(utxos, color, sum, exclude=[]):
+def select_utxo(utxos, color, sum, exclude=[], sort_reverse=False):
     if not utxos:
         return []
 
     utxos = [utxo for utxo in utxos if utxo['color'] == color and utxo not in exclude]
-    utxos = sorted(utxos, key=lambda utxo: utxo['value'])
+    utxos = sorted(utxos, key=lambda utxo: utxo['value'], reverse=sort_reverse)
 
     value = 0
     for i, utxo in enumerate(utxos):
@@ -139,7 +139,8 @@ class GcoinPresenter(object):
             tx_type = 5
 
         ins = [utxo_to_txin(utxo) for utxo in inputs]
-        return gcoin.make_raw_tx(ins, outs, tx_type)
+        raw_tx = gcoin.make_raw_tx(ins, outs, tx_type)
+        return raw_tx
 
     def create_license(self, address, color):
         license = {
@@ -171,12 +172,3 @@ class GcoinPresenter(object):
             return False
         else:
             return True
-
-
-class SmartContractPresenter(GcoinPresenter):
-
-    def deploy(self, code):
-        pass
-
-    def trade(self, from_address, to_address, amount):
-        pass
