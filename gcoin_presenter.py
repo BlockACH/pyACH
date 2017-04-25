@@ -21,12 +21,12 @@ def balance_from_utxos(utxos):
     return balance_dict
 
 
-def select_utxo(utxos, color, sum, exclude=[]):
+def select_utxo(utxos, color, sum, exclude=[], sort_reverse=False):
     if not utxos:
         return []
 
     utxos = [utxo for utxo in utxos if utxo['color'] == color and utxo not in exclude]
-    utxos = sorted(utxos, key=lambda utxo: utxo['value'])
+    utxos = sorted(utxos, key=lambda utxo: utxo['value'], reverse=sort_reverse)
 
     value = 0
     for i, utxo in enumerate(utxos):
@@ -46,8 +46,9 @@ def utxo_to_txin(utxo):
 
 class GcoinPresenter(object):
 
-    def __init__(self):
-        self.rpc_conn = get_rpc_connection()
+    @property
+    def rpc_conn(self):
+        return get_rpc_connection()
 
     def get_address_balance(self, address):
         utxos = self.rpc_conn.gettxoutaddress(address)
@@ -138,7 +139,8 @@ class GcoinPresenter(object):
             tx_type = 5
 
         ins = [utxo_to_txin(utxo) for utxo in inputs]
-        return gcoin.make_raw_tx(ins, outs, tx_type)
+        raw_tx = gcoin.make_raw_tx(ins, outs, tx_type)
+        return raw_tx
 
     def create_license(self, address, color):
         license = {

@@ -1,3 +1,6 @@
 env/
+pypyenv/
 *.pyc
 *.log
+
+.remote-sync.json

@@ -24,11 +24,16 @@ def reset_bank_balance(bank):
     print diff, bank.bank_id, bank.address, bank.balance
 
 
-def main():
+def init_bank():
     central_bank = Bank.manager.get_central_bank()
     fixed_address = gcoin.get_fixed_address()
+
     gcoin.mint(1, 0)
     gcoin.mint(1, 0)
+    if gcoin.get_address_balance(fixed_address).get(0, 0) < 2:
+        print 'wait gcoin mint 1 0....'
+        time.sleep(100)
+
     should_wait_license = False
     if not gcoin.is_license_exist(1):
         gcoin.create_license(fixed_address, 1)
@@ -38,10 +43,20 @@ def main():
         should_wait_license = True
 
     if should_wait_license:
-        time.sleep(90)
+        print 'wait license confirmed....'
+        time.sleep(100)
 
-    gcoin.mint(1000000000, 1)
-    gcoin.mint(1000000000, 2)
+    should_wait_confirm = False
+    if gcoin.get_address_balance(fixed_address).get(1, 0) < 2000000000:
+        gcoin.mint(2000000000, 1)
+        should_wait_confirm = True
+    if gcoin.get_address_balance(fixed_address).get(2, 0) < 1000000000:
+        gcoin.mint(1000000000, 2)
+        should_wait_confirm = True
+
+    if should_wait_confirm:
+        print 'wait mint confirmed....'
+        time.sleep(100)
     gcoin.send_to_address(central_bank.address, 1000000000, 1)
     gcoin.send_to_address(central_bank.address, 1000000000, 2)
 
@@ -54,4 +69,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    init_bank()
