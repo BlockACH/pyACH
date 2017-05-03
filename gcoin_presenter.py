@@ -51,6 +51,7 @@ class GcoinPresenter(object):
         return get_rpc_connection()
 
     def get_address_balance(self, address):
+        # print 'before get utxos'
         utxos = self.rpc_conn.gettxoutaddress(address)
         return balance_from_utxos(utxos)
 
@@ -91,8 +92,9 @@ class GcoinPresenter(object):
             color_utxos = [utxo for utxo in utxos if utxo['color'] == color]
 
     def create_raw_tx(self, address_from, address_to, amount, color, comment=''):
+        # print 'before finding utxos'
         utxos = self.rpc_conn.gettxoutaddress(address_from)
-
+        # print 'utxos:', utxos
         if color != 1:
             inputs = select_utxo(utxos=utxos, color=color, sum=amount)
             fee_inputs = select_utxo(utxos=utxos, color=1, sum=1, exclude=inputs)

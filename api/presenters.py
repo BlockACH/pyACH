@@ -9,7 +9,6 @@ from bank import Bank
 class GcoinPresenter(object):
     def is_gcoin_alive(self):
         response = {}
-        # TODO rpcccccccccc
         return response
 
     def clean_main_directory(self):

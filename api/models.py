@@ -27,7 +27,7 @@ class BaseDbModel(object):
 
 
 class HistoryTx(BaseDbModel):
-    db_url = 'mongodb://ach:graduate@13.78.116.125:27017/ach'
+    db_url = 'mongodb://ach:graduate@ach.csie.org:27017/ach'
     db_name = 'ach'
     collection_name = 'transactions'
 
