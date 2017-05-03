@@ -25,6 +25,10 @@ def send_tx():
 
 
 def settle():
+    print 'deploy contract...'
+    central_bank = Bank.manager.get_central_bank()
+    central_bank.deploy_contract(contract_id=CONTRACT_ID)
+
     init_bank()
 
     uri = 'mongodb://ach:graduate@localhost:27017/ach'
