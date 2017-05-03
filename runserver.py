@@ -1,3 +1,5 @@
+import sys
+
 from flask import Flask
 
 from api.settle_views import settle
@@ -7,5 +9,7 @@ app = Flask(__name__)
 app.register_blueprint(settle, url_prefix='/settle')
 app.register_blueprint(smart_contract, url_prefix='/smart_contract')
 
+port = sys.argv[2]
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8514, debug=True)
+    app.run(host='0.0.0.0', port=port, debug=True)
