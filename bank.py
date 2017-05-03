@@ -44,7 +44,10 @@ class Bank(object):
 
     def __init__(self, bank_id):
         self.bank_id = bank_id
-        self.priv = gcoin_lib.encode_privkey(gcoin_lib.sha256(bank_id), 'wif_compressed')
+        self.priv = gcoin_lib.encode_privkey(
+            gcoin_lib.sha256(bank_id),
+            'wif_compressed'
+        )
         self.pub = gcoin_lib.privtopub(self.priv)
         self.address = gcoin_lib.pubtoaddr(self.pub)
         self.gcoin = GcoinPresenter()

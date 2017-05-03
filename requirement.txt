@@ -4,3 +4,4 @@ pymongo
 Flask
 requests
 git+https://github.com/BlockACH/crypto_utils@master
+plyvel
