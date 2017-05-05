@@ -4,12 +4,9 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 SMART_CONTRACT_PATH = os.path.join(BASE_DIR, 'smart_contract')
 
-API_DB_PATH = os.path.join(BASE_DIR, 'api', 'db')
-API_SMART_CONTRACT_DB_PATH = os.path.join(API_DB_PATH, 'smart_contract')
-API_SMART_CONTRACT_TX_DB_PATH = os.path.join(API_SMART_CONTRACT_DB_PATH, 'tx')
-
-API_SETTLE_DB_PATH = os.path.join(API_DB_PATH, 'settle')
-API_SETTLE_TX_DB_PATH = os.path.join(API_SETTLE_DB_PATH, 'tx')
+API_PATH = os.path.join(BASE_DIR, 'api')
+API_SMART_CONTRACT_TX_DB_PATH = os.path.join(API_PATH, 'smart_contract_tx')
+API_SETTLE_TX_DB_PATH = os.path.join(API_PATH, 'settle_tx')
 
 GCOIN_RPC = {
     'user': '',

@@ -1,3 +1,4 @@
+import json
 import random
 import plyvel
 
@@ -44,7 +45,7 @@ class HistoryTx(object):
 
 class AbstractTx(object):
     """
-    trigger_bank, receive_bank, type, amount, status, create_time,
+    trigger_bank, receive_bank, type, amount, status, created_time,
     tx_id(gcoin)
     """
     def __init__(self):
@@ -57,7 +58,7 @@ class AbstractTx(object):
             raise AttributeError('`{}` attribute should be defined'.format('db_path'))
 
     def put_tx(self, key, tx):
-        self.db.put(key, tx)
+        self.db.put(key, json.dumps(tx))
 
 
 class SettleTx(AbstractTx):

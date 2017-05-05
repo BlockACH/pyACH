@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 from presenters import HistoryDataPresenter
 from presenters import GcoinPresenter
+from presenters import NotificationPresenter
 
 settle = Blueprint('settle', __name__)
 
@@ -38,7 +39,6 @@ def history_data_pay():
 def history_data_range():
     start_date = request.args.get('start', '')
     end_date = request.args.get('end', '')
-    tx_type = request.args.get('txtype', '')
     presenter = HistoryDataPresenter()
     return jsonify(data=presenter.range_data(start_date, end_date))
 
@@ -63,3 +63,11 @@ def trigger():
         return jsonify(data=request.form)
     else:
         return jsonify(data={})
+
+
+@settle.route('/notify', methods=['POST'])
+def notify():
+    data = request.json
+    presenter = NotificationPresenter()
+    key = presenter.notify(data)
+    return jsonify(data={'key': key})
