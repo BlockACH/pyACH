@@ -9,7 +9,10 @@ app = Flask(__name__)
 app.register_blueprint(settle, url_prefix='/settle')
 app.register_blueprint(smart_contract, url_prefix='/smart_contract')
 
-port = sys.argv[2]
+if len(sys.argv) > 1:
+    port = int(sys.argv[1])
+else:
+    port = 8514
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=port, debug=True)
