@@ -75,6 +75,13 @@ def query():
     return jsonify(data=txs)
 
 
+@settle.route('/transaction/removeall', methods=['POST'])
+def remove_all():
+    presenter = TransactionPresenter()
+    presenter.remove_all()
+    return jsonify(data={'message': 'Deleted!'})
+
+
 @settle.route('/notify', methods=['POST'])
 def notify():
     data = request.json

@@ -58,6 +58,9 @@ class TransactionPresenter(object):
         txs = SettleTx().get_tx(trigger_bank, receive_bank)
         return txs
 
+    def remove_all(self):
+        SettleTx().remove_all()
+
 
 class HistoryDataPresenter(object):
 
