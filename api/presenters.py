@@ -1,10 +1,9 @@
 import subprocess as sub
 import os
-import json
 
-from collections import namedtuple
 from api.models import HistoryTx
 from bank import Bank
+
 
 class GcoinPresenter(object):
     def is_gcoin_alive(self):
@@ -36,6 +35,7 @@ class GcoinPresenter(object):
             response['status'] = 'success'
             response['message'] = 'Clean successfully!'
         return response
+
 
 class HistoryDataPresenter(object):
 

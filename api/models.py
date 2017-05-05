@@ -1,35 +1,19 @@
 import random
+import plyvel
 
 from pymongo import MongoClient
-from config import BANK_LIST
-
-class BaseDbModel(object):
-
-    def __init__(self):
-        mongo = MongoClient(self.get_db_url())
-        self.db = mongo[self.get_db_name()]
-        self.collection = self.db[self.get_collection_name()]
-
-    def get_db_url(self):
-        return self._get_attribute('db_url')
-
-    def get_db_name(self):
-        return self._get_attribute('db_name')
-
-    def get_collection_name(self):
-        return self._get_attribute('collection_name')
-
-    def _get_attribute(self, attr_name):
-        if hasattr(self, attr_name):
-            return getattr(self, attr_name)
-        else:
-            raise AttributeError('`{}` attribute should be defined'.format(attr_name))
+from config import BANK_LIST, API_SMART_CONTRACT_TX_DB_PATH, API_SETTLE_TX_DB_PATH
 
 
-class HistoryTx(BaseDbModel):
+class HistoryTx(object):
     db_url = 'mongodb://ach:graduate@ach.csie.org:27017/ach'
     db_name = 'ach'
     collection_name = 'transactions'
+
+    def __init__(self):
+        mongo = MongoClient(self.db_url)
+        self.db = mongo[self.db_name]
+        self.collection = self.db[self.collection_name]
 
     def get_query_dict(self, start_date, end_date):
         return {
@@ -57,11 +41,28 @@ class HistoryTx(BaseDbModel):
         cursor = self.collection.find(query, no_cursor_timeout=True)
         return cursor
 
-class Tx(BaseDbModel):
-    db_url = 'mongodb://ach:graduate@13.78.116.125:27017/tx'
-    db_name = 'tx'
-    collection_name = 'transactions'
+
+class AbstractTx(object):
     """
-    trigger_bank, receive_bank, type, amount, tx_id, status
+    trigger_bank, receive_bank, type, amount, status, create_time,
+    tx_id(gcoin)
     """
-    pass
+    def __init__(self):
+        self.db = plyvel.DB(self.get_db_path(), create_if_missing=True)
+
+    def get_db_path(self):
+        if hasattr(self, 'db_path'):
+            return getattr(self, 'db_path')
+        else:
+            raise AttributeError('`{}` attribute should be defined'.format('db_path'))
+
+    def put_tx(self, key, tx):
+        self.db.put(key, tx)
+
+
+class SettleTx(AbstractTx):
+    db_path = API_SETTLE_TX_DB_PATH
+
+
+class SmartContractTx(AbstractTx):
+    db_path = API_SMART_CONTRACT_TX_DB_PATH
