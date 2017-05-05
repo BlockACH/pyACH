@@ -45,6 +45,16 @@ class HistoryTx(object):
         return cursor
 
 
+class TxFactory(object):
+    @staticmethod
+    def get(model):
+        if model == 'settle':
+            return SettleTx()
+        elif model == 'smart_contract':
+            return SmartContractTx()
+        return None
+
+
 class AbstractTx(object):
     """
     trigger_bank, receive_bank, type, amount, status, created_time,
