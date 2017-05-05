@@ -1,11 +1,28 @@
-
 import os
 
 import subprocess as sub
 import gcoin as gcoin_lib
 
-from api.models import HistoryTx, SettleTx
+from api.models import HistoryTx, TxFactory
 from bank import Bank
+
+
+class AbstractApiDbPresenter(object):
+    def __init__(self, model='settle'):
+        self.model = model
+        self.tx_db = TxFactory.get(self.model)
+
+
+class NotificationPresenter(AbstractApiDbPresenter):
+
+    def notify(self, data):
+        to_hash = (
+            '{receive_bank}{trigger_bank}{amount}{type}{created_time}'
+            .format(**data)
+        )
+        key = gcoin_lib.sha256(to_hash)
+        self.tx_db.put_tx(key, data)
+        return key
 
 
 class GcoinPresenter(object):
@@ -38,18 +55,6 @@ class GcoinPresenter(object):
             response['status'] = 'success'
             response['message'] = 'Clean successfully!'
         return response
-
-
-class NotificationPresenter(object):
-
-    def notify(self, data):
-        to_hash = (
-            '{receive_bank}{trigger_bank}{amount}{type}{created_time}'
-            .format(**data)
-        )
-        key = gcoin_lib.sha256(to_hash)
-        SettleTx().put_tx(key, data)
-        return key
 
 
 class TransactionPresenter(object):
