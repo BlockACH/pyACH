@@ -72,11 +72,15 @@ class AbstractTx(object):
                 if json_value['receive_bank'] == receive_bank:
                     return_list.append(json_value)
             else:
-                return_list.append(json.loads(value))
+                return_list.append(json_value)
         return return_list
 
     def put_tx(self, key, tx):
         self.db.put(key, json.dumps(tx))
+
+    def remove_all(self):
+        for key, value in self.db.iterator():
+            self.db.delete(key)
 
 
 class SettleTx(AbstractTx):
