@@ -67,7 +67,8 @@ class Bank(object):
         return self.ecc.get_pubkey()
 
     def get_contract_balance(self, contract_id):
-        url = 'http://ach.csie.org:9999/smart_contract/state/{}'.format(contract_id)
+        url = ('http://ach.csie.org:9999/smart_contract/state/{}'
+               .format(contract_id))
         r = requests.get(url)
         return r.json()['balance'][self.bank_id]
 
@@ -78,10 +79,12 @@ class Bank(object):
         """
         This uses gcoin currency to settle. `amount` should be in BTC.
         """
-        raw_tx = self.gcoin.create_raw_tx(self.address, bank_to.address, amount, color, comment)
+        raw_tx = self.gcoin.create_raw_tx(self.address, bank_to.address,
+                                          amount, color, comment)
         return self._sign_and_send_tx(raw_tx)
 
-    def contract_send_to(self, bank_to, amount, comment='', contract_id=DEFAULT_CONTRACT_ID):
+    def contract_send_to(self, bank_to, amount, comment='',
+                         contract_id=DEFAULT_CONTRACT_ID):
         """
         This uses smart contract to settle.
         """
@@ -93,28 +96,36 @@ class Bank(object):
             # self.confidential_tx_pub,
             # bank_to.confidential_tx_pub
         ]
-        #contract_data = encrypt(contract_data, pub_keys)
-        raw_tx = self.gcoin.create_raw_tx(self.address, self.address, 1, 1, contract_data)
+        # contract_data = encrypt(contract_data, pub_keys)
+        raw_tx = self.gcoin.create_raw_tx(self.address, self.address, 1,
+                                          1, contract_data)
         return self._sign_and_send_tx(raw_tx)
 
-    def contract_mint(self, amount, comment='', contract_id=DEFAULT_CONTRACT_ID):
-        contract_data = create_mint_data(self.bank_id, amount, comment, contract_id)
-        raw_tx = self.gcoin.create_raw_tx(self.address, self.address, 1, 1, contract_data)
+    def contract_mint(self, amount, comment='',
+                      contract_id=DEFAULT_CONTRACT_ID):
+        contract_data = create_mint_data(self.bank_id, amount,
+                                         comment, contract_id)
+        raw_tx = self.gcoin.create_raw_tx(self.address, self.address,
+                                          1, 1, contract_data)
         return self._sign_and_send_tx(raw_tx)
 
-    def contract_clear_queue(self, comment='', contract_id=DEFAULT_CONTRACT_ID):
+    def contract_clear_queue(self, comment='',
+                             contract_id=DEFAULT_CONTRACT_ID):
         contract_data = create_clear_queue_data(comment, contract_id)
-        raw_tx = self.gcoin.create_raw_tx(self.address, self.address, 1, 1, contract_data)
+        raw_tx = self.gcoin.create_raw_tx(self.address, self.address,
+                                          1, 1, contract_data)
         return self._sign_and_send_tx(raw_tx)
 
     def deploy_contract(self, contract_id=DEFAULT_CONTRACT_ID):
         deploy_data = create_deploy_data(contract_id)
-        raw_tx = self.gcoin.create_raw_tx(self.address, self.address, 1, 1, deploy_data)
+        raw_tx = self.gcoin.create_raw_tx(self.address, self.address,
+                                          1, 1, deploy_data)
         return self._sign_and_send_tx(raw_tx)
 
     def reset_contract(self, contract_id=DEFAULT_CONTRACT_ID):
         contract_data = create_reset_data(contract_id)
-        raw_tx = self.gcoin.create_raw_tx(self.address, self.address, 1, 1, contract_data)
+        raw_tx = self.gcoin.create_raw_tx(self.address, self.address,
+                                          1, 1, contract_data)
         return self._sign_and_send_tx(raw_tx)
 
     def _sign_and_send_tx(self, raw_tx):

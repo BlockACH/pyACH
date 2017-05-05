@@ -84,7 +84,8 @@ def remove_all():
 
 @settle.route('/notify', methods=['POST'])
 def notify():
+    bank_id = request.args.get('bank_id', '')
     data = request.json
-    presenter = NotificationPresenter()
+    presenter = NotificationPresenter(bank_id, 'settle')
     key = presenter.notify(data)
     return jsonify(data={'key': key})

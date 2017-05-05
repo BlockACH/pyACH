@@ -47,11 +47,11 @@ class HistoryTx(object):
 
 class TxFactory(object):
     @staticmethod
-    def get(model):
+    def get(bank_id, model):
         if model == 'settle':
-            return SettleTx()
+            return SettleTx(bank_id)
         elif model == 'smart_contract':
-            return SmartContractTx()
+            return SmartContractTx(bank_id)
         return None
 
 
@@ -60,8 +60,9 @@ class AbstractTx(object):
     trigger_bank, receive_bank, type, amount, status, created_time,
     tx_id(gcoin)
     """
-    def __init__(self):
-        self.db = plyvel.DB(self.get_db_path(), create_if_missing=True)
+    def __init__(self, bank_id):
+        db = plyvel.DB(self.get_db_path(), create_if_missing=True)
+        self.db = db.prefixed_db(bank_id)
 
     def get_db_path(self):
         if hasattr(self, 'db_path'):

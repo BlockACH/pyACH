@@ -16,6 +16,7 @@ GCOIN_RPC = {
 }
 
 BANK_LIST = [
+    # banks from history data
     '6AB', 'A28', '46E', 'DD3', '822', 'CCC', '219',
     '18C', '170', 'B63', '62F', '5E0', '666', '519',
     'BA4', '5BD', '682', 'E07', 'B31', '0B1', 'FCB',
@@ -23,8 +24,17 @@ BANK_LIST = [
     'AB5', 'A1D', 'F73', 'C45', '481', '49A', 'EE0',
     '269', '7BA', '48C', 'E0C', 'CE3', '8DA', '552',
     '1F6', 'B30', '6D4', 'FB4', '4AD', '940', '838',
-    'E15', 'F8E', '717', 'C72', '882', 'EA0'
+    'E15', 'F8E', '717', 'C72', '882', 'EA0',
+    # banks for demo
+    'X', 'Y', 'Z', 'TCH'
 ]
+
+DEMO_BANK_IP_PORT = {
+    'X': '{}:{}'.format('localhost', '9487'),
+    'Y': '{}:{}'.format('localhost', '9486'),
+    'Z': '{}:{}'.format('localhost', '9485'),
+    'TCH': '{}:{}'.format('localhost', '9484'),
+}
 
 CLEAN_COLOR = 2
 
