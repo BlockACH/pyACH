@@ -1,5 +1,7 @@
 env/
 pypyenv/
+smart_contract_tx/
+settle_tx/
 *.pyc
 *.log
 .remote-sync.json
