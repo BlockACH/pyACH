@@ -1,7 +1,8 @@
 from flask import Blueprint, jsonify, request
-from presenters import HistoryDataPresenter
-from presenters import GcoinPresenter
-from presenters import NotificationPresenter
+from presenters import (
+    HistoryDataPresenter, GcoinPresenter,
+    NotificationPresenter, TransactionPresenter
+)
 
 settle = Blueprint('settle', __name__)
 
@@ -63,6 +64,15 @@ def trigger():
         return jsonify(data=request.form)
     else:
         return jsonify(data={})
+
+
+@settle.route('/transaction/query', methods=['GET'])
+def query():
+    trigger_bank = request.args.get('t', '')
+    receive_bank = request.args.get('r', '')
+    presenter = TransactionPresenter()
+    txs = presenter.query(trigger_bank, receive_bank)
+    return jsonify(data=txs)
 
 
 @settle.route('/notify', methods=['POST'])

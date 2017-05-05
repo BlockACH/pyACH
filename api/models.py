@@ -3,7 +3,9 @@ import random
 import plyvel
 
 from pymongo import MongoClient
-from config import BANK_LIST, API_SMART_CONTRACT_TX_DB_PATH, API_SETTLE_TX_DB_PATH
+from config import (
+    BANK_LIST, API_SMART_CONTRACT_TX_DB_PATH, API_SETTLE_TX_DB_PATH
+)
 
 
 class HistoryTx(object):
@@ -55,7 +57,23 @@ class AbstractTx(object):
         if hasattr(self, 'db_path'):
             return getattr(self, 'db_path')
         else:
-            raise AttributeError('`{}` attribute should be defined'.format('db_path'))
+            raise AttributeError(
+                '`{}` attribute should be defined'.format('db_path')
+            )
+
+    def get_tx(self, trigger_bank, receive_bank):
+        return_list = []
+        for key, value in self.db.iterator():
+            json_value = json.loads(value)
+            if trigger_bank:
+                if json_value['trigger_bank'] == trigger_bank:
+                    return_list.append(json_value)
+            elif receive_bank:
+                if json_value['receive_bank'] == receive_bank:
+                    return_list.append(json_value)
+            else:
+                return_list.append(json.loads(value))
+        return return_list
 
     def put_tx(self, key, tx):
         self.db.put(key, json.dumps(tx))
