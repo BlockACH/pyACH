@@ -52,6 +52,13 @@ class NotificationPresenter(object):
         return key
 
 
+class TransactionPresenter(object):
+
+    def query(self, trigger_bank, receive_bank):
+        txs = SettleTx().get_tx(trigger_bank, receive_bank)
+        return txs
+
+
 class HistoryDataPresenter(object):
 
     def wrapper(self, data):
