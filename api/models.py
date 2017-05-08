@@ -4,7 +4,7 @@ import plyvel
 
 from pymongo import MongoClient
 from config import (
-    BANK_LIST, API_SMART_CONTRACT_TX_DB_PATH, API_SETTLE_TX_DB_PATH
+    BANK_LIST, SMART_CONTRACT_DB_PATH, SETTLE_DB_PATH
 )
 
 
@@ -49,20 +49,27 @@ class TxFactory(object):
     @staticmethod
     def get(bank_id, model):
         if model == 'settle':
-            return SettleTx(bank_id)
+            db_path = '{base}/{bank}'.format(
+                base=SETTLE_DB_PATH,
+                bank=bank_id,
+            )
+            return Tx(db_path)
         elif model == 'smart_contract':
-            return SmartContractTx(bank_id)
+            db_path = '{base}/{bank}'.format(
+                base=SMART_CONTRACT_DB_PATH,
+                bank=bank_id,
+            )
+            return Tx(db_path)
         return None
 
 
-class AbstractTx(object):
+class Tx(object):
     """
     trigger_bank, receive_bank, type, amount, status, created_time,
     tx_id(gcoin)
     """
-    def __init__(self, bank_id):
-        db = plyvel.DB(self.get_db_path(), create_if_missing=True)
-        self.db = db.prefixed_db(bank_id)
+    def __init__(self, db_path):
+        self.db = plyvel.DB(db_path, create_if_missing=True)
 
     def get_db_path(self):
         if hasattr(self, 'db_path'):
@@ -92,11 +99,3 @@ class AbstractTx(object):
     def remove_all(self):
         for key, value in self.db.iterator():
             self.db.delete(key)
-
-
-class SettleTx(AbstractTx):
-    db_path = API_SETTLE_TX_DB_PATH
-
-
-class SmartContractTx(AbstractTx):
-    db_path = API_SMART_CONTRACT_TX_DB_PATH

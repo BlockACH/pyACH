@@ -1,7 +1,6 @@
 import os
 import time
 import requests
-import json
 
 import subprocess as sub
 import gcoin as gcoin_lib
@@ -59,17 +58,15 @@ class TriggerPresenter(BaseTxPresenter):
         self.notify_receiver(tx_data)
 
     def notify_receiver(self, data):
-        # receive_bank_id = data['receive_bank']
-        # base_url = DEMO_BANK_IP_PORT[receive_bank_id]
-        # url = 'http://{base_url}/{model}/notify'.format(
-        #     base_url='ach.csie.org:9877',
-        #     model=self.model
-        # )
-        url = 'http://ach.csie.org:9877/smart_contract/notify'
-        headers = {'content-type': 'application/json'}
-        print url, data
-        r = requests.post(url, data=json.dumps(data), headers=headers)
-        print 'uuum...', r
+        receive_bank_id = data['receive_bank']
+        base_url = DEMO_BANK_IP_PORT[receive_bank_id]
+        url = 'http://{base_url}/{model}/notify?bank_id={bank_id}'.format(
+            base_url=base_url,
+            model=self.model,
+            bank_id=receive_bank_id
+        )
+        r = requests.post(url, json=data)
+        return r.json()
 
 
 class GcoinPresenter(object):
