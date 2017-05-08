@@ -4,9 +4,9 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 SMART_CONTRACT_PATH = os.path.join(BASE_DIR, 'smart_contract')
 
-API_PATH = os.path.join(BASE_DIR, 'api')
-API_SMART_CONTRACT_TX_DB_PATH = os.path.join(API_PATH, 'smart_contract_tx')
-API_SETTLE_TX_DB_PATH = os.path.join(API_PATH, 'settle_tx')
+DB_PATH = os.path.join(BASE_DIR, 'db')
+SMART_CONTRACT_DB_PATH = os.path.join(DB_PATH, 'smart_contract')
+SETTLE_DB_PATH = os.path.join(DB_PATH, 'settle')
 
 GCOIN_RPC = {
     'user': '',
@@ -30,10 +30,10 @@ BANK_LIST = [
 ]
 
 DEMO_BANK_IP_PORT = {
-    'X': '{}:{}'.format('localhost', '9487'),
-    'Y': '{}:{}'.format('localhost', '9486'),
-    'Z': '{}:{}'.format('localhost', '9485'),
-    'TCH': '{}:{}'.format('localhost', '9484'),
+    'X': '{}:{}'.format('localhost', '9877'),
+    'Y': '{}:{}'.format('localhost', '9877'),
+    'Z': '{}:{}'.format('localhost', '9877'),
+    'TCH': '{}:{}'.format('localhost', '9877'),
 }
 
 CLEAN_COLOR = 2
