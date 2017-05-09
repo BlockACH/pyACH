@@ -7,14 +7,13 @@ import gcoin as gcoin_lib
 
 from api.models import HistoryTx, TxFactory
 from bank import Bank
-from config import DEMO_BANK_IP_PORT
 
 
 class BaseTxPresenter(object):
     def __init__(self, bank_id, model='settle'):
         self.model = model
-        self.bank_id = bank_id
-        self.tx_db = TxFactory.get(self.bank_id, self.model)
+        self.bank = Bank.manager.get_bank_by_id(bank_id)
+        self.tx_db = TxFactory.get(bank_id, self.model)
 
     def save_tx(self, data):
         try:
@@ -24,7 +23,13 @@ class BaseTxPresenter(object):
             )
         except Exception:
             raise self.TxFormatError('missing tx attribute')
+
         key = gcoin_lib.sha256(to_hash)
+        if 'key' not in data:
+            data['key'] = key
+        elif data['key'] != key:
+            raise self.TxFormatError('key does not match')
+
         self.tx_db.put_tx(key, data)
         return key
 
@@ -48,25 +53,104 @@ class TransactionPresenter(BaseTxPresenter):
         self.tx_db.remove_all()
 
 
-class TriggerPresenter(BaseTxPresenter):
+class TxStateChangePresenter(BaseTxPresenter):
 
-    def trigger(self, data):
+    def ready(self, data):
         tx_data = dict(data)
         tx_data['created_time'] = int(time.time())
         tx_data['status'] = 'ready'
         self.save_tx(tx_data)
-        self.notify_receiver(tx_data)
+        self.notify_other(tx_data, tx_data['receive_bank'])
+        return tx_data
 
-    def notify_receiver(self, data):
-        receive_bank_id = data['receive_bank']
-        base_url = DEMO_BANK_IP_PORT[receive_bank_id]
-        url = 'http://{base_url}/{model}/notify?bank_id={bank_id}'.format(
+    def accept(self, tx_key):
+        tx_data = self.update_status(tx_key, 'accepted')
+        if self.model == 'smart_contract':
+            tx_data, is_success = self.smart_contract_settle(tx_data)
+            if not is_success:
+                return tx_data
+        self.notify_other(tx_data, tx_data['trigger_bank'])
+        self.notify_other(tx_data, 'TCH')
+        return tx_data
+
+    def smart_contract_settle(self, tx_data):
+        bank_from, bank_to = self.parse_from_and_to_bank(tx_data)
+        amount = tx_data['amount']
+        try:
+            tx_id = bank_from.contract_send_to(bank_to, amount)
+        except Exception:
+            tx_data = self.reject(tx_data['key'])
+            return tx_data, False
+        else:
+            tx_data['tx_id'] = tx_id
+            self.save_tx(tx_data)
+            return tx_data, True
+
+    def reject(self, tx_key):
+        tx_data = self.update_status(tx_key, 'rejected')
+        self.notify_other(tx_data, tx_data['trigger_bank'])
+        self.notify_other(tx_data, 'TCH')
+        return tx_data
+
+    def approve(self, tx_key):
+        tx_data = self.update_status(tx_key, 'approved')
+        if self.model == 'settle':
+            tx_data, is_success = self.gcoin_settle(tx_data)
+            if not is_success:
+                return tx_data
+        self.notify_other(tx_data, tx_data['trigger_bank'])
+        self.notify_other(tx_data, tx_data['receive_bank'])
+        return tx_data
+
+    def gcoin_settle(self, tx_data):
+        bank_from, bank_to = self.parse_from_and_to_bank(tx_data)
+        amount = tx_data['amount']
+        try:
+            tx_id = bank_from.send_to(bank_to, amount)
+        except Exception:
+            tx_data = self.reject(tx_data['key'])
+            return tx_data, False
+        else:
+            tx_data['tx_id'] = tx_id
+            self.save_tx(tx_data)
+            return tx_data, True
+
+    def destroy(self, tx_key):
+        tx_data = self.update_status(tx_key, 'destroyed')
+        self.notify_other(tx_data, tx_data['trigger_bank'])
+        self.notify_other(tx_data, tx_data['receive_bank'])
+        return tx_data
+
+    def update_status(self, tx_key, status):
+        tx_data = self.tx_db.get_tx_by_key(tx_key)
+        tx_data['status'] = status
+        self.save_tx(tx_data)
+        return tx_data
+
+    def notify_other(self, data, bank_id_to_notify):
+        bank = Bank.manager.get_bank_by_id(bank_id_to_notify)
+        base_url = bank.url
+        url = '{base_url}/{model}/notify?bank_id={bank_id}'.format(
             base_url=base_url,
             model=self.model,
-            bank_id=receive_bank_id
+            bank_id=bank_id_to_notify
         )
         r = requests.post(url, json=data)
         return r.json()
+
+    def parse_from_and_to_bank(self, tx_data):
+        trigger_bank = Bank.manager.get_bank_by_id(tx_data['trigger_bank'])
+        receive_bank = Bank.manager.get_bank_by_id(tx_data['receive_bank'])
+        if tx_data['type'] == 'SC':
+            bank_from = trigger_bank
+            bank_to = receive_bank
+        else:
+            bank_from = receive_bank
+            bank_to = trigger_bank
+        return bank_from, bank_to
+
+    class TxChangeError(Exception):
+        """error for tx changes"""
 
 
 class GcoinPresenter(object):

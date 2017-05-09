@@ -2,6 +2,8 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
+CONTRACT_SERVER_URL = 'http://ach.csie.org:9999'
+
 SMART_CONTRACT_PATH = os.path.join(BASE_DIR, 'smart_contract')
 
 DB_PATH = os.path.join(BASE_DIR, 'db')
@@ -29,11 +31,11 @@ BANK_LIST = [
     'X', 'Y', 'Z', 'TCH'
 ]
 
-DEMO_BANK_IP_PORT = {
-    'X': '{}:{}'.format('localhost', '9877'),
-    'Y': '{}:{}'.format('localhost', '9877'),
-    'Z': '{}:{}'.format('localhost', '9877'),
-    'TCH': '{}:{}'.format('localhost', '9877'),
+BANK_URL = {
+    'X': 'http://{}:{}'.format('', ''),
+    'Y': 'http://{}:{}'.format('', ''),
+    'Z': 'http://{}:{}'.format('', ''),
+    'TCH': 'http://{}:{}'.format('', ''),
 }
 
 CLEAN_COLOR = 2

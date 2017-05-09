@@ -96,6 +96,10 @@ class Tx(object):
     def put_tx(self, key, tx):
         self.db.put(key, json.dumps(tx))
 
+    def get_tx_by_key(self, key):
+        tx_data = self.db.get(str(key))
+        return json.loads(tx_data)
+
     def remove_all(self):
         for key, value in self.db.iterator():
             self.db.delete(key)
