@@ -2,14 +2,15 @@ import requests
 import gcoin as gcoin_lib
 from crypto_utils import create_ecc
 
-from config import BANK_LIST, CLEAN_COLOR
+from config import (
+    BANK_LIST, BANK_URL, CLEAN_COLOR, CONTRACT_SERVER_URL
+)
 from gcoin_presenter import GcoinPresenter
-from smart_contract.utils import (create_trade_data,
-                                  create_deploy_data,
-                                  create_mint_data,
-                                  create_clear_queue_data,
-                                  create_reset_data,
-                                  DEFAULT_CONTRACT_ID)
+from smart_contract.utils import (
+    create_trade_data, create_deploy_data,
+    create_mint_data, create_clear_queue_data,
+    create_reset_data, DEFAULT_CONTRACT_ID
+)
 
 
 class BankManager(object):
@@ -51,6 +52,7 @@ class Bank(object):
         self.pub = gcoin_lib.privtopub(self.priv)
         self.address = gcoin_lib.pubtoaddr(self.pub)
         self.gcoin = GcoinPresenter()
+        self.url = BANK_URL.get(self.bank_id)
         # ECC for confidential tx
         self.ecc = create_ecc(gcoin_lib.sha256(self.bank_id))
 
@@ -67,8 +69,10 @@ class Bank(object):
         return self.ecc.get_pubkey()
 
     def get_contract_balance(self, contract_id):
-        url = ('http://ach.csie.org:9999/smart_contract/state/{}'
-               .format(contract_id))
+        url = '{server_url}/smart_contract/state/{contract_id}'.format(
+            server_url=CONTRACT_SERVER_URL,
+            contract_id=contract_id
+        )
         r = requests.get(url)
         return r.json()['balance'][self.bank_id]
 
