@@ -130,7 +130,7 @@ class TxStateChangePresenter(BaseTxPresenter):
     def notify_other(self, data, bank_id_to_notify):
         bank = Bank.manager.get_bank_by_id(bank_id_to_notify)
         base_url = bank.url
-        url = '{base_url}/{model}/notify?bank_id={bank_id}'.format(
+        url = '{base_url}/{model}/{bank_id}/notify'.format(
             base_url=base_url,
             model=self.model,
             bank_id=bank_id_to_notify

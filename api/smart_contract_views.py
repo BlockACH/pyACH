@@ -22,7 +22,7 @@ def notify(bank_id):
     return jsonify(data={'key': key})
 
 
-@smart_contract.route('/<bank_id>/transaction/query', methods=['GET'])
+@smart_contract.route('/<bank_id>/transactions/query', methods=['GET'])
 def query(bank_id):
     trigger_bank = request.args.get('t', '')
     receive_bank = request.args.get('r', '')
@@ -31,7 +31,7 @@ def query(bank_id):
     return jsonify(data=txs)
 
 
-@smart_contract.route('/<bank_id>/transaction/ready', methods=['POST'])
+@smart_contract.route('/<bank_id>/transactions/ready', methods=['POST'])
 def ready(bank_id):
     data = request.json
     presenter = TxStateChangePresenter(bank_id, SMART_CONTRACT_MODEL)
@@ -39,7 +39,7 @@ def ready(bank_id):
     return jsonify(data=tx_data)
 
 
-@smart_contract.route('/<bank_id>/transaction/accept', methods=['POST'])
+@smart_contract.route('/<bank_id>/transactions/accept', methods=['POST'])
 def accept(bank_id):
     data = request.json
     presenter = TxStateChangePresenter(bank_id, SMART_CONTRACT_MODEL)
