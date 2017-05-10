@@ -44,9 +44,9 @@ class Bank(object):
     manager = bank_manager
 
     def __init__(self, bank_id):
-        self.bank_id = bank_id
+        self.bank_id = str(bank_id)
         self.priv = gcoin_lib.encode_privkey(
-            gcoin_lib.sha256(bank_id),
+            gcoin_lib.sha256(self.bank_id),
             'wif_compressed'
         )
         self.pub = gcoin_lib.privtopub(self.priv)
