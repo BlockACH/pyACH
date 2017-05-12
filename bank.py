@@ -68,13 +68,39 @@ class Bank(object):
     def confidential_tx_pub(self):
         return self.ecc.get_pubkey()
 
+    def as_dict(self, model='settle', contract_id=DEFAULT_CONTRACT_ID):
+        result_dict = {
+            'bank_id': self.bank_id,
+            'address': self.address,
+        }
+
+        if model == 'settle':
+            result_dict['balance'] = float(self.balance[CLEAN_COLOR])
+        else:
+            result_dict['balance'] = self.get_contract_balance(contract_id)
+            result_dict['unsettled_balance'] = (
+                self.get_contract_unsettled_balance(contract_id)
+            )
+
+        return result_dict
+
     def get_contract_balance(self, contract_id=DEFAULT_CONTRACT_ID):
         url = '{server_url}/smart_contract/state/{contract_id}'.format(
             server_url=CONTRACT_SERVER_URL,
             contract_id=contract_id
         )
         r = requests.get(url)
-        return r.json()['balance'][self.bank_id]
+        balances = r.json().get('balance', {})
+        return balances.get(self.bank_id, 'N/A')
+
+    def get_contract_unsettled_balance(self, contract_id=DEFAULT_CONTRACT_ID):
+        url = '{server_url}/smart_contract/state/{contract_id}'.format(
+            server_url=CONTRACT_SERVER_URL,
+            contract_id=contract_id
+        )
+        r = requests.get(url)
+        balances = r.json().get('unsettled_balance', {})
+        return balances.get(self.bank_id, 'N/A')
 
     def merge_tx_in(self, color, div=50):
         self.gcoin.merge_tx_in(self.address, color, self.priv, div)

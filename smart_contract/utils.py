@@ -28,7 +28,11 @@ def create_trade_data(from_address, to_address, amount, comment='',
         'type': 'RUN_CONTRACT',
         'contract_id': contract_id,
         'function': 'trade',
-        'data': {'from_address': from_address, 'to_address': to_address, 'amount': amount},
+        'data': {
+            'from_address': from_address,
+            'to_address': to_address,
+            'amount': amount
+        },
         'comment': comment,
     }
     return json.dumps(contract_data)
