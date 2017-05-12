@@ -1,7 +1,6 @@
-from flask import Blueprint, jsonify, request
-from presenters import (
-    TxStateChangePresenter, NotificationPresenter,
-    TransactionPresenter
+from flask import Blueprint
+from common_views_func import (
+    query, ready, accept, reject, notify, balance_list
 )
 
 SMART_CONTRACT_MODEL = 'smart_contract'
@@ -14,42 +13,31 @@ def index():
     return 'Smart Contract!'
 
 
-@smart_contract.route('/<bank_id>/notify', methods=['POST'])
-def notify(bank_id):
-    data = request.json
-    presenter = NotificationPresenter(bank_id, SMART_CONTRACT_MODEL)
-    key = presenter.notify(data)
-    return jsonify(data={'key': key})
+@smart_contract.route('/<bank_id>/balances')
+def smart_contract_balance_list(bank_id):
+    return balance_list(bank_id, SMART_CONTRACT_MODEL)
+
+
+@smart_contract.route('/<bank_id>/transactions/notify', methods=['POST'])
+def smart_contract_notify(bank_id):
+    return notify(bank_id, SMART_CONTRACT_MODEL)
 
 
 @smart_contract.route('/<bank_id>/transactions/query', methods=['GET'])
-def query(bank_id):
-    trigger_bank = request.args.get('t', '')
-    receive_bank = request.args.get('r', '')
-    presenter = TransactionPresenter(bank_id, SMART_CONTRACT_MODEL)
-    txs = presenter.query(trigger_bank, receive_bank)
-    return jsonify(data=txs)
+def smart_contract_query(bank_id):
+    return query(bank_id, SMART_CONTRACT_MODEL)
 
 
 @smart_contract.route('/<bank_id>/transactions/ready', methods=['POST'])
-def ready(bank_id):
-    data = request.json
-    presenter = TxStateChangePresenter(bank_id, SMART_CONTRACT_MODEL)
-    tx_data = presenter.ready(data)
-    return jsonify(data=tx_data)
+def smart_contract_ready(bank_id):
+    return ready(bank_id, SMART_CONTRACT_MODEL)
 
 
 @smart_contract.route('/<bank_id>/transactions/accept', methods=['POST'])
-def accept(bank_id):
-    data = request.json
-    presenter = TxStateChangePresenter(bank_id, SMART_CONTRACT_MODEL)
-    tx_data = presenter.accept(data['key'])
-    return jsonify(data=tx_data)
+def smart_contract_accept(bank_id):
+    return accept(bank_id, SMART_CONTRACT_MODEL)
 
 
-@smart_contract.route('/<bank_id>/transaction/reject', methods=['POST'])
-def reject(bank_id):
-    data = request.json
-    presenter = TxStateChangePresenter(bank_id, SMART_CONTRACT_MODEL)
-    tx_data = presenter.reject(data['key'])
-    return jsonify(data=tx_data)
+@smart_contract.route('/<bank_id>/transactions/reject', methods=['POST'])
+def smart_contract_reject(bank_id):
+    return reject(bank_id, SMART_CONTRACT_MODEL)

@@ -1,9 +1,14 @@
 from flask import Blueprint, jsonify, request
 from presenters import (
     HistoryDataPresenter, GcoinPresenter,
-    NotificationPresenter, TransactionPresenter
+    TransactionPresenter, TxStateChangePresenter
+)
+from common_views_func import (
+    query, ready, accept, reject, notify, balance_list
 )
 
+
+SETTLE_MODEL = 'settle'
 settle = Blueprint('settle', __name__)
 
 
@@ -58,23 +63,6 @@ def bank_address(bank_id):
     return jsonify(data=presenter.bank_address_dict())
 
 
-@settle.route('/<bank_id>/transaction/trigger', methods=['GET', 'POST'])
-def trigger(bank_id):
-    if request.method == 'POST':
-        return jsonify(data=request.form)
-    else:
-        return jsonify(data={})
-
-
-@settle.route('/<bank_id>/transaction/query', methods=['GET'])
-def query(bank_id):
-    trigger_bank = request.args.get('t', '')
-    receive_bank = request.args.get('r', '')
-    presenter = TransactionPresenter()
-    txs = presenter.query(trigger_bank, receive_bank)
-    return jsonify(data=txs)
-
-
 @settle.route('/<bank_id>/transaction/removeall', methods=['POST'])
 def remove_all(bank_id):
     presenter = TransactionPresenter()
@@ -82,9 +70,47 @@ def remove_all(bank_id):
     return jsonify(data={'message': 'Deleted!'})
 
 
-@settle.route('/<bank_id>/notify', methods=['POST'])
-def notify(bank_id):
+@settle.route('/<bank_id>/balances')
+def settle_balance_list(bank_id):
+    return balance_list(bank_id, SETTLE_MODEL)
+
+
+@settle.route('/<bank_id>/transactions/query', methods=['GET'])
+def settle_query(bank_id):
+    return query(bank_id, SETTLE_MODEL)
+
+
+@settle.route('/<bank_id>/transactions/notify', methods=['POST'])
+def settle_notify(bank_id):
+    return notify(bank_id, SETTLE_MODEL)
+
+
+@settle.route('/<bank_id>/transactions/ready', methods=['POST'])
+def settle_ready(bank_id):
+    return ready(bank_id, SETTLE_MODEL)
+
+
+@settle.route('/<bank_id>/transactions/accept', methods=['POST'])
+def settle_accept(bank_id):
+    return accept(bank_id, SETTLE_MODEL)
+
+
+@settle.route('/<bank_id>/transactions/reject', methods=['POST'])
+def settle_reject(bank_id):
+    return reject(bank_id, SETTLE_MODEL)
+
+
+@settle.route('/<bank_id>/transactions/approve', methods=['POST'])
+def settle_approve(bank_id):
     data = request.json
-    presenter = NotificationPresenter(bank_id, 'settle')
-    key = presenter.notify(data)
-    return jsonify(data={'key': key})
+    presenter = TxStateChangePresenter(bank_id, SETTLE_MODEL)
+    tx_data = presenter.approve(data['key'])
+    return jsonify(data=tx_data)
+
+
+@settle.route('/<bank_id>/transactions/destroy', methods=['POST'])
+def settle_destroy(bank_id):
+    data = request.json
+    presenter = TxStateChangePresenter(bank_id, SETTLE_MODEL)
+    tx_data = presenter.destroy(data['key'])
+    return jsonify(data=tx_data)

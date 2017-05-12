@@ -1,4 +1,5 @@
 import sys
+import urllib
 
 from flask import Flask, url_for, jsonify
 
@@ -10,9 +11,8 @@ app.register_blueprint(settle, url_prefix='/settle')
 app.register_blueprint(smart_contract, url_prefix='/smart_contract')
 
 
-@app.route('/')
+@app.route('/urls')
 def list_routes():
-    import urllib
     output = []
     for rule in app.url_map.iter_rules():
 
@@ -27,8 +27,6 @@ def list_routes():
         ))
         output.append(line)
 
-    for line in sorted(output):
-        print line
     return jsonify(data=output)
 
 

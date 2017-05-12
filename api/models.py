@@ -79,7 +79,7 @@ class Tx(object):
                 '`{}` attribute should be defined'.format('db_path')
             )
 
-    def get_tx(self, trigger_bank, receive_bank):
+    def get_txs(self, trigger_bank=None, receive_bank=None, status=None):
         return_list = []
         for key, value in self.db.iterator():
             json_value = json.loads(value)
@@ -91,6 +91,12 @@ class Tx(object):
                     return_list.append(json_value)
             else:
                 return_list.append(json_value)
+
+        if status:
+            return_list = filter(
+                lambda tx: tx.get('status') == status,
+                return_list
+            )
         return return_list
 
     def put_tx(self, key, tx):
