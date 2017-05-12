@@ -68,7 +68,7 @@ class Bank(object):
     def confidential_tx_pub(self):
         return self.ecc.get_pubkey()
 
-    def get_contract_balance(self, contract_id):
+    def get_contract_balance(self, contract_id=DEFAULT_CONTRACT_ID):
         url = '{server_url}/smart_contract/state/{contract_id}'.format(
             server_url=CONTRACT_SERVER_URL,
             contract_id=contract_id

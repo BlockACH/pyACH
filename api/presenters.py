@@ -7,10 +7,47 @@ import gcoin as gcoin_lib
 
 from api.models import HistoryTx, TxFactory
 from bank import Bank
+from config import AUTHORIZED_BANKS
+
+
+class BalancePresenter(object):
+    def __init__(self, bank_id, model):
+        self.model = model
+        self.bank = Bank.manager.get_bank_by_id(bank_id)
+
+    @property
+    def balance_list(self):
+        if self.model == 'settle':
+            return self.settle_model_balance_list()
+        elif self.model == 'smart_contract':
+            return self.smart_contract_balance_list()
+        return []
+
+    def settle_model_balance_list(self):
+        balance_list = []
+        if self.bank.bank_id in AUTHORIZED_BANKS:
+            for bank_id in Bank.manager.bank_list:
+                bank = Bank.manager.get_bank_by_id(bank_id)
+                balance_list.append(bank.balance)
+        else:
+            bank = Bank.manager.get_bank_by_id(self.bank.bank_id)
+            balance_list.append(bank.balance)
+        return balance_list
+
+    def smart_contract_balance_list(self):
+        balance_list = []
+        if self.bank.bank_id in AUTHORIZED_BANKS:
+            for bank_id in Bank.manager.bank_list:
+                bank = Bank.manager.get_bank_by_id(bank_id)
+                balance_list.append(bank.get_contract_balance())
+        else:
+            bank = Bank.manager.get_bank_by_id(self.bank.bank_id)
+            balance_list.append(bank.get_contract_balance())
+        return balance_list
 
 
 class BaseTxPresenter(object):
-    def __init__(self, bank_id, model='settle'):
+    def __init__(self, bank_id, model):
         self.model = model
         self.bank = Bank.manager.get_bank_by_id(bank_id)
         self.tx_db = TxFactory.get(bank_id, self.model)
@@ -45,8 +82,8 @@ class NotificationPresenter(BaseTxPresenter):
 
 class TransactionPresenter(BaseTxPresenter):
 
-    def query(self, trigger_bank, receive_bank):
-        txs = self.tx_db.get_tx(trigger_bank, receive_bank)
+    def query(self, trigger_bank, receive_bank, status):
+        txs = self.tx_db.get_txs(trigger_bank, receive_bank, status)
         return txs
 
     def remove_all(self):
@@ -130,12 +167,13 @@ class TxStateChangePresenter(BaseTxPresenter):
     def notify_other(self, data, bank_id_to_notify):
         bank = Bank.manager.get_bank_by_id(bank_id_to_notify)
         base_url = bank.url
-        url = '{base_url}/{model}/{bank_id}/notify'.format(
+        url = '{base_url}/{model}/{bank_id}/transactions/notify'.format(
             base_url=base_url,
             model=self.model,
             bank_id=bank_id_to_notify
         )
         r = requests.post(url, json=data)
+        print r
         return r.json()
 
     def parse_from_and_to_bank(self, tx_data):
