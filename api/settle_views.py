@@ -4,7 +4,7 @@ from presenters import (
     TransactionPresenter, TxStateChangePresenter
 )
 from common_views_func import (
-    query, ready, accept, reject, notify, balance_list
+    query, ready, accept, reject, notify, banks
 )
 
 
@@ -70,9 +70,9 @@ def remove_all(bank_id):
     return jsonify(data={'message': 'Deleted!'})
 
 
-@settle.route('/<bank_id>/balances')
-def settle_balance_list(bank_id):
-    return balance_list(bank_id, SETTLE_MODEL)
+@settle.route('/<bank_id>/banks')
+def settle_banks(bank_id):
+    return banks(bank_id, SETTLE_MODEL)
 
 
 @settle.route('/<bank_id>/transactions/query', methods=['GET'])

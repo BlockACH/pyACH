@@ -10,40 +10,22 @@ from bank import Bank
 from config import AUTHORIZED_BANKS
 
 
-class BalancePresenter(object):
+class BankPresenter(object):
     def __init__(self, bank_id, model):
         self.model = model
         self.bank = Bank.manager.get_bank_by_id(bank_id)
 
     @property
-    def balance_list(self):
-        if self.model == 'settle':
-            return self.settle_model_balance_list()
-        elif self.model == 'smart_contract':
-            return self.smart_contract_balance_list()
-        return []
-
-    def settle_model_balance_list(self):
-        balance_list = []
+    def banks(self):
+        banks = []
         if self.bank.bank_id in AUTHORIZED_BANKS:
             for bank_id in Bank.manager.bank_list:
                 bank = Bank.manager.get_bank_by_id(bank_id)
-                balance_list.append(bank.balance)
+                banks.append(bank.as_dict(model=self.model))
         else:
             bank = Bank.manager.get_bank_by_id(self.bank.bank_id)
-            balance_list.append(bank.balance)
-        return balance_list
-
-    def smart_contract_balance_list(self):
-        balance_list = []
-        if self.bank.bank_id in AUTHORIZED_BANKS:
-            for bank_id in Bank.manager.bank_list:
-                bank = Bank.manager.get_bank_by_id(bank_id)
-                balance_list.append(bank.get_contract_balance())
-        else:
-            bank = Bank.manager.get_bank_by_id(self.bank.bank_id)
-            balance_list.append(bank.get_contract_balance())
-        return balance_list
+            banks.append(bank.as_dict(model=self.model))
+        return banks
 
 
 class BaseTxPresenter(object):

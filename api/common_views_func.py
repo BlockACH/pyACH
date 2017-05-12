@@ -1,15 +1,15 @@
 from flask import jsonify, request
 from presenters import (
-    BalancePresenter,
+    BankPresenter,
     TransactionPresenter,
     TxStateChangePresenter,
     NotificationPresenter
 )
 
 
-def balance_list(bank_id, model):
-    presenter = BalancePresenter(bank_id, model)
-    return jsonify(data=presenter.balance_list)
+def banks(bank_id, model):
+    presenter = BankPresenter(bank_id, model)
+    return jsonify(data=presenter.banks)
 
 
 def query(bank_id, model):

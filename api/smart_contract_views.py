@@ -1,6 +1,6 @@
 from flask import Blueprint
 from common_views_func import (
-    query, ready, accept, reject, notify, balance_list
+    query, ready, accept, reject, notify, banks
 )
 
 SMART_CONTRACT_MODEL = 'smart_contract'
@@ -13,9 +13,9 @@ def index():
     return 'Smart Contract!'
 
 
-@smart_contract.route('/<bank_id>/balances')
-def smart_contract_balance_list(bank_id):
-    return balance_list(bank_id, SMART_CONTRACT_MODEL)
+@smart_contract.route('/<bank_id>/banks')
+def smart_contract_banks(bank_id):
+    return banks(bank_id, SMART_CONTRACT_MODEL)
 
 
 @smart_contract.route('/<bank_id>/transactions/notify', methods=['POST'])
