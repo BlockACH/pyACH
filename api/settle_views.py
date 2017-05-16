@@ -4,7 +4,7 @@ from presenters import (
     TransactionPresenter, TxStateChangePresenter
 )
 from common_views_func import (
-    query, ready, accept, reject, notify, banks
+    query, ready, accept, reject, notify, banks, removeall
 )
 
 
@@ -63,11 +63,9 @@ def bank_address(bank_id):
     return jsonify(data=presenter.bank_address_dict())
 
 
-@settle.route('/<bank_id>/transaction/removeall', methods=['POST'])
+@settle.route('/<bank_id>/transactions/removeall', methods=['POST'])
 def remove_all(bank_id):
-    presenter = TransactionPresenter()
-    presenter.remove_all()
-    return jsonify(data={'message': 'Deleted!'})
+    return removeall(bank_id, SETTLE_MODEL)
 
 
 @settle.route('/<bank_id>/banks')
