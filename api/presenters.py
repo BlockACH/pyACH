@@ -5,6 +5,7 @@ import requests
 import subprocess as sub
 import gcoin as gcoin_lib
 
+from flask import jsonify
 from api.models import HistoryTx, TxFactory
 from bank import Bank
 from config import AUTHORIZED_BANKS
@@ -70,6 +71,7 @@ class TransactionPresenter(BaseTxPresenter):
 
     def remove_all(self):
         self.tx_db.remove_all()
+        return jsonify(data={'message': 'Deleted!'})
 
 
 class TxStateChangePresenter(BaseTxPresenter):

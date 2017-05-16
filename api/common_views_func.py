@@ -21,6 +21,11 @@ def query(bank_id, model):
     return jsonify(data=txs)
 
 
+def removeall(bank_id, model):
+    presenter = TransactionPresenter(bank_id, model)
+    return presenter.remove_all()
+
+
 def ready(bank_id, model):
     data = request.json
     presenter = TxStateChangePresenter(bank_id, model)
