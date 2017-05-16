@@ -67,7 +67,7 @@ class TransactionPresenter(BaseTxPresenter):
 
     def query(self, trigger_bank, receive_bank, status):
         txs = self.tx_db.get_txs(trigger_bank, receive_bank, status)
-        return txs
+        return sorted(txs, key=lambda k: k['created_time'], reverse=True)
 
     def remove_all(self):
         self.tx_db.remove_all()
