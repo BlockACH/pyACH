@@ -1,6 +1,6 @@
 import requests
 import gcoin as gcoin_lib
-from crypto_utils import create_ecc
+from crypto_utils import create_ecc, encrypt
 
 from config import (
     BANK_LIST, BANK_URL, CLEAN_COLOR, CONTRACT_SERVER_URL
@@ -120,13 +120,13 @@ class Bank(object):
         """
         contract_data = create_trade_data(self.bank_id, bank_to.bank_id,
                                           amount, comment, contract_id)
-        central_bank = Bank.manager.get_central_bank()
+        tch = Bank.manager.get_bank_by_id('TCH')
         pub_keys = [
-            central_bank.confidential_tx_pub,
+            tch.confidential_tx_pub,
             # self.confidential_tx_pub,
             # bank_to.confidential_tx_pub
         ]
-        # contract_data = encrypt(contract_data, pub_keys)
+        contract_data = encrypt(contract_data, pub_keys)
         raw_tx = self.gcoin.create_raw_tx(self.address, self.address, 1,
                                           1, contract_data)
         return self._sign_and_send_tx(raw_tx)
