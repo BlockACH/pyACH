@@ -8,7 +8,7 @@ from config import (
 from gcoin_presenter import GcoinPresenter
 from smart_contract.utils import (
     create_trade_data, create_deploy_data,
-    create_mint_data, create_clear_queue_data,
+    create_mint_data, create_batch_settle_data,
     create_reset_data, DEFAULT_CONTRACT_ID
 )
 
@@ -139,9 +139,9 @@ class Bank(object):
                                           1, 1, contract_data)
         return self._sign_and_send_tx(raw_tx)
 
-    def contract_clear_queue(self, comment='',
-                             contract_id=DEFAULT_CONTRACT_ID):
-        contract_data = create_clear_queue_data(comment, contract_id)
+    def contract_batch_settle(self, comment='',
+                              contract_id=DEFAULT_CONTRACT_ID):
+        contract_data = create_batch_settle_data(comment, contract_id)
         raw_tx = self.gcoin.create_raw_tx(self.address, self.address,
                                           1, 1, contract_data)
         return self._sign_and_send_tx(raw_tx)

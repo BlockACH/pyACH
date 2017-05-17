@@ -3,7 +3,7 @@ import json
 from config import SMART_CONTRACT_PATH
 
 
-DEFAULT_CONTRACT_ID = 2
+DEFAULT_CONTRACT_ID = 4
 
 
 def create_reset_data(contract_id, comment=''):
@@ -50,11 +50,11 @@ def create_mint_data(address, amount, comment='',
     return json.dumps(contract_data)
 
 
-def create_clear_queue_data(comment='', contract_id=DEFAULT_CONTRACT_ID):
+def create_batch_settle_data(comment='', contract_id=DEFAULT_CONTRACT_ID):
     contract_data = {
         'type': 'RUN_CONTRACT',
         'contract_id': contract_id,
-        'function': 'clear_queue',
+        'function': 'batch_settle',
         'data': {},
         'comment': comment,
     }
