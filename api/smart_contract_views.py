@@ -1,4 +1,5 @@
-from flask import Blueprint
+from flask import Blueprint, jsonify, request
+from presenters import BatchSettlePresenter, SmartContractMintPresenter
 from common_views_func import (
     query, ready, accept, reject, notify, banks
 )
@@ -13,7 +14,26 @@ def index():
     return 'Smart Contract!'
 
 
-@smart_contract.route('/<bank_id>/banks')
+@smart_contract.route('/<bank_id>/batch_settle', methods=['POST'])
+def batch_settle(bank_id):
+    if bank_id == 'TCH':
+        presenter = BatchSettlePresenter()
+        txid = presenter.batch_settle()
+        return jsonify(data=txid)
+    return jsonify({'error': 'unauthorized'})
+
+
+@smart_contract.route('/<bank_id>/mint', methods=['POST'])
+def mint(bank_id):
+    if bank_id == 'TCH':
+        data = request.json
+        presenter = SmartContractMintPresenter()
+        txid = presenter.mint(data['bank'], data['amount'])
+        return jsonify(data=txid)
+    return jsonify({'error': 'unauthorized'})
+
+
+@smart_contract.route('/<bank_id>/banks', methods=['GET'])
 def smart_contract_banks(bank_id):
     return banks(bank_id, SMART_CONTRACT_MODEL)
 
