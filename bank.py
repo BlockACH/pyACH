@@ -17,13 +17,16 @@ class BankManager(object):
 
     def __init__(self):
         self.bank_list = BANK_LIST
-        self.bank_list.append('central_bank')
         self.bank_cache = {}
         self._central_bank = None
         self.tx_pool = []
 
     def get_bank_by_id(self, bank_id):
-        if bank_id not in self.bank_list:
+        if (
+            bank_id not in self.bank_list and
+            bank_id != 'TCH' and
+            bank_id != 'central_bank'
+        ):
             bank_id = 'EA0'
 
         if bank_id not in self.bank_cache:
@@ -34,6 +37,11 @@ class BankManager(object):
     def get_central_bank(self):
         if not self._central_bank:
             self._central_bank = Bank('central_bank')
+        return self._central_bank
+
+    def get_tch(self):
+        if not self._central_bank:
+            self._central_bank = Bank('tch')
         return self._central_bank
 
 
