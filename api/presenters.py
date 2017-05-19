@@ -82,7 +82,7 @@ class TransactionPresenter(BaseTxPresenter):
 
     def query(self, trigger_bank, receive_bank, status):
         txs = self.tx_db.get_txs(trigger_bank, receive_bank, status)
-        return txs
+        return sorted(txs, key=lambda k: k['created_time'], reverse=True)
 
     def remove_all(self):
         self.tx_db.remove_all()
@@ -143,7 +143,7 @@ class TxStateChangePresenter(BaseTxPresenter):
         try:
             tx_id = bank_from.send_to(bank_to, amount)
         except Exception:
-            tx_data = self.reject(tx_data['key'])
+            tx_data = self.destroy(tx_data['key'])
             return tx_data, False
         else:
             tx_data['tx_id'] = tx_id
