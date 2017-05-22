@@ -19,6 +19,7 @@ class BankManager(object):
         self.bank_list = BANK_LIST
         self.bank_list.append('central_bank')
         self.bank_cache = {}
+        self._tch = None
         self._central_bank = None
         self._tch = None
         self.tx_pool = []
