@@ -18,6 +18,7 @@ class BankManager(object):
     def __init__(self):
         self.bank_list = BANK_LIST
         self.bank_cache = {}
+        self._tch = None
         self._central_bank = None
         self.tx_pool = []
 
@@ -41,7 +42,7 @@ class BankManager(object):
 
     def get_tch(self):
         if not self._tch:
-            self._tch = Bank('tch')
+            self._tch = Bank('TCH')
         return self._tch
 
 
@@ -131,8 +132,8 @@ class Bank(object):
         tch = Bank.manager.get_tch()
         pub_keys = [
             tch.confidential_tx_pub,
-            # self.confidential_tx_pub,
-            # bank_to.confidential_tx_pub
+            self.confidential_tx_pub,
+            bank_to.confidential_tx_pub
         ]
         contract_data = encrypt(contract_data, pub_keys)
         raw_tx = self.gcoin.create_raw_tx(self.address, self.address, 1,

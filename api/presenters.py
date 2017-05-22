@@ -113,16 +113,20 @@ class TxStateChangePresenter(BaseTxPresenter):
         amount = tx_data['amount']
         try:
             tx_id = bank_from.contract_send_to(bank_to, amount)
-        except Exception:
-            tx_data = self.reject(tx_data['key'])
+        except Exception as e:
+            tx_data = self.reject(tx_data['key'], e.message)
             return tx_data, False
         else:
             tx_data['tx_id'] = tx_id
             self.save_tx(tx_data)
             return tx_data, True
 
-    def reject(self, tx_key):
+    def reject(self, tx_key, reason=''):
         tx_data = self.update_status(tx_key, 'rejected')
+        if reason:
+            tx_data['reject_reason'] = reason
+            self.save_tx(tx_data)
+
         self.notify_other(tx_data, tx_data['trigger_bank'])
         self.notify_other(tx_data, 'TCH')
         return tx_data
@@ -142,16 +146,19 @@ class TxStateChangePresenter(BaseTxPresenter):
         amount = tx_data['amount']
         try:
             tx_id = bank_from.send_to(bank_to, amount)
-        except Exception:
-            tx_data = self.destroy(tx_data['key'])
+        except Exception as e:
+            tx_data = self.destroy(tx_data['key'], e.message)
             return tx_data, False
         else:
             tx_data['tx_id'] = tx_id
             self.save_tx(tx_data)
             return tx_data, True
 
-    def destroy(self, tx_key):
+    def destroy(self, tx_key, reason=''):
         tx_data = self.update_status(tx_key, 'destroyed')
+        if reason:
+            tx_data['destroy_reason'] = reason
+            self.save_tx(tx_data)
         self.notify_other(tx_data, tx_data['trigger_bank'])
         self.notify_other(tx_data, tx_data['receive_bank'])
         return tx_data
