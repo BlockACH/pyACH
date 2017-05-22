@@ -40,9 +40,9 @@ class BankManager(object):
         return self._central_bank
 
     def get_tch(self):
-        if not self._central_bank:
-            self._central_bank = Bank('tch')
-        return self._central_bank
+        if not self._tch:
+            self._tch = Bank('tch')
+        return self._tch
 
 
 bank_manager = BankManager()
@@ -128,7 +128,7 @@ class Bank(object):
         """
         contract_data = create_trade_data(self.bank_id, bank_to.bank_id,
                                           amount, comment, contract_id)
-        tch = Bank.manager.get_bank_by_id('TCH')
+        tch = Bank.manager.get_tch()
         pub_keys = [
             tch.confidential_tx_pub,
             # self.confidential_tx_pub,
