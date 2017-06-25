@@ -5,7 +5,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CONTRACT_SERVER_URL = 'http://ach.csie.org:9999'
 
 CLEAN_COLOR = 2
-SMART_CONTRACT_ID = 4
+SMART_CONTRACT_ID = 1
 
 SMART_CONTRACT_PATH = os.path.join(BASE_DIR, 'smart_contract')
 
@@ -14,10 +14,10 @@ SMART_CONTRACT_DB_PATH = os.path.join(DB_PATH, 'smart_contract')
 SETTLE_DB_PATH = os.path.join(DB_PATH, 'settle')
 
 GCOIN_RPC = {
-    'user': '',
-    'password': '',
-    'host': '',
-    'port': '',
+    'user': 'boolafish',
+    'password': 'abc123',
+    'host': 'ach.csie.org',
+    'port': '1125',
 }
 
 AUTHORIZED_BANKS = ['TCH', 'central_bank']
