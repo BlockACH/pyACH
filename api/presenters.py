@@ -20,8 +20,9 @@ class BankPresenter(object):
         banks = []
         if self.bank.bank_id in AUTHORIZED_BANKS:
             for bank_id in Bank.manager.bank_list:
-                bank = Bank.manager.get_bank_by_id(bank_id)
-                banks.append(bank.as_dict(model=self.model))
+                if bank_id not in AUTHORIZED_BANKS:
+                    bank = Bank.manager.get_bank_by_id(bank_id)
+                    banks.append(bank.as_dict(model=self.model))
         else:
             bank = Bank.manager.get_bank_by_id(self.bank.bank_id)
             banks.append(bank.as_dict(model=self.model))

@@ -1,9 +1,9 @@
 import os
 import json
-from config import SMART_CONTRACT_PATH
+from config import SMART_CONTRACT_PATH, SMART_CONTRACT_ID
 
 
-DEFAULT_CONTRACT_ID = 4
+DEFAULT_CONTRACT_ID = SMART_CONTRACT_ID
 
 
 def create_reset_data(contract_id, comment=''):
