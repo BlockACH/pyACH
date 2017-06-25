@@ -63,7 +63,8 @@ class GcoinPresenter(object):
             raise Exception('Not support to merge color 1')
 
         utxos = self.rpc_conn.gettxoutaddress(address)
-        color_utxos = [] if not utxos else [utxo for utxo in utxos if utxo['color'] == color]
+        color_utxos = filter(lambda utxo: utxo['color'] == color, utxos or [])
+        # color_utxos = [] if not utxos else [utxo for utxo in utxos if utxo['color'] == color]
 
         while len(color_utxos) > div:
             print 'REMAINING {} txins....'.format(len(color_utxos))
@@ -86,10 +87,73 @@ class GcoinPresenter(object):
                     })
             ins = [utxo_to_txin(utxo) for utxo in inputs]
             raw_tx = gcoin.make_raw_tx(ins, outs)
-            signed_tx = gcoin.signall(raw_tx, priv, parallel=True)
+            signed_tx = gcoin.signall(raw_tx, priv)
             self.send_raw_tx(signed_tx)
             utxos = self.rpc_conn.gettxoutaddress(address)
             color_utxos = [utxo for utxo in utxos if utxo['color'] == color]
+
+    def batch_create_raw_tx(self, address_from, output_targets, color, comment=''):
+        """
+        this provide raw tw sending from a single address to multiple
+        targeting (address, amount) output pair.
+
+        output_targets = [(addr1, amount1), (addr2, amount2), (addr3, amount3)...]
+        """
+        utxos = self.rpc_conn.gettxoutaddress(address_from)
+        print output_targets
+        amounts = map(lambda x: x[1], output_targets)
+        total_amount = reduce(lambda x, y: x + y, amounts)
+
+        if color != 1:
+            inputs = select_utxo(utxos=utxos, color=color, sum=total_amount)
+            fee_inputs = select_utxo(utxos=utxos, color=1, sum=1, exclude=inputs)
+            if not inputs:
+                raise Exception('not enough balance')
+            if not fee_inputs:
+                raise Exception('not enough fee balance')
+            inputs.extend(fee_inputs)
+        else:
+            inputs = select_utxo(utxos=utxos, color=color, sum=total_amount + 1)
+            if not inputs:
+                raise Exception('not enough balance')
+
+        outs = []
+        for address, amount in output_targets:
+            outs.append({
+                'address': address,
+                'value': int(Decimal(str(amount)) * 10**8),
+                'color': color
+            })
+
+        inputs_balance = balance_from_utxos(inputs)
+        for input_color in inputs_balance:
+            change_amount = Decimal(str(inputs_balance[input_color]))
+
+            if input_color == color:
+                change_amount = change_amount - Decimal(str(total_amount))
+
+            if input_color == 1:
+                change_amount = change_amount - 1
+
+            if change_amount:
+                outs.append({
+                    'address': address_from,
+                    'value': int(change_amount * 10**8),
+                    'color': input_color
+                })
+
+        tx_type = 0
+        if comment:
+            outs.append({
+                'script': gcoin.mk_op_return_script(comment.encode('utf8')),
+                'value': 0,
+                'color': 0
+            })
+            tx_type = 5
+
+        ins = [utxo_to_txin(utxo) for utxo in inputs]
+        raw_tx = gcoin.make_raw_tx(ins, outs, tx_type)
+        return raw_tx
 
     def create_raw_tx(self, address_from, address_to, amount, color, comment=''):
         # print 'before finding utxos'
@@ -131,7 +195,7 @@ class GcoinPresenter(object):
                     'color': input_color
                 })
 
-        tx_type = 0
+        tx_type = 5
         if comment:
             outs.append({
                 'script': gcoin.mk_op_return_script(comment.encode('utf8')),

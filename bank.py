@@ -17,9 +17,10 @@ class BankManager(object):
 
     def __init__(self):
         self.bank_list = BANK_LIST
+        self.bank_list.append('central_bank')
         self.bank_cache = {}
-        self._tch = None
         self._central_bank = None
+        self._tch = None
         self.tx_pool = []
 
     def get_bank_by_id(self, bank_id):
@@ -64,6 +65,8 @@ class Bank(object):
         self.url = BANK_URL.get(self.bank_id)
         # ECC for confidential tx
         self.ecc = create_ecc(gcoin_lib.sha256(self.bank_id))
+
+        self.batch_send_to_queue = {}
 
     @property
     def balance(self):
@@ -113,6 +116,34 @@ class Bank(object):
 
     def merge_tx_in(self, color, div=50):
         self.gcoin.merge_tx_in(self.address, color, self.priv, div)
+
+    def batch_execute(self):
+        tx_ids = []
+        for color in self.batch_send_to_queue:
+            if self.batch_send_to_queue[color]:
+                self.merge_tx_in(color, 20)
+                raw_tx = self.gcoin.batch_create_raw_tx(
+                    self.address,
+                    self.batch_send_to_queue[color],
+                    color
+                )
+                tx_id = self._sign_and_send_tx(raw_tx)
+                tx_ids.append(tx_id)
+                self.batch_send_to_queue[color] = []
+
+        return tx_ids
+
+    def batch_send_to(self, bank_to, amount, color=CLEAN_COLOR, comment=''):
+        """
+        This use gcoin currency to settle. However to enhance speed,
+        merge multiple txs into one.
+
+        Call `batch_execute` to start create and put tx into gcoin.
+        """
+        if color not in self.batch_send_to_queue:
+            self.batch_send_to_queue[color] = []
+
+        self.batch_send_to_queue[color].append((bank_to.address, amount))
 
     def send_to(self, bank_to, amount, color=CLEAN_COLOR, comment=''):
         """

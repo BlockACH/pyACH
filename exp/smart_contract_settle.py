@@ -36,7 +36,7 @@ def settle():
     db = astar_mongo['ach']
     collection = db['transactions']
 
-    previous_day = '010506020'
+    previous_day = '01050620'
     current_day = '01050621'
 
     query = {
