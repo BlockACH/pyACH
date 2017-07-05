@@ -19,6 +19,7 @@ class BankManager(object):
         self.bank_list = BANK_LIST
         self.bank_cache = {}
         self._central_bank = None
+        self._tch = None
         self.tx_pool = []
 
     def get_bank_by_id(self, bank_id):
@@ -41,7 +42,7 @@ class BankManager(object):
 
     def get_tch(self):
         if not self._tch:
-            self._tch = Bank('tch')
+            self._tch = Bank('TCH')
         return self._tch
 
 

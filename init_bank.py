@@ -29,29 +29,29 @@ def reset_bank_balance(bank, central_bank):
 
 def main():
     central_bank = Bank.manager.get_central_bank()
-    # fixed_address = gcoin.get_fixed_address()
-    # gcoin.mint(1, 0)
-    # gcoin.mint(1, 0)
-    #
-    # time.sleep(90)
-    #
-    # should_wait_license = False
-    # if not gcoin.is_license_exist(1):
-    #     gcoin.create_license(fixed_address, 1)
-    #     should_wait_license = True
-    # if not gcoin.is_license_exist(2):
-    #     gcoin.create_license(fixed_address, 2)
-    #     should_wait_license = True
-    #
-    # if should_wait_license:
-    #     time.sleep(90)
-    #
-    # gcoin.mint(7000000000, 1)
-    # gcoin.mint(7000000000, 2)
-    #
-    # time.sleep(90)
-    # gcoin.send_to_address(central_bank.address, 1000000000, 1)
-    # gcoin.send_to_address(central_bank.address, 1000000000, 2)
+    fixed_address = gcoin.get_fixed_address()
+    gcoin.mint(1, 0)
+    gcoin.mint(1, 0)
+   
+    time.sleep(90)
+   
+    should_wait_license = False
+    if not gcoin.is_license_exist(1):
+        gcoin.create_license(fixed_address, 1)
+        should_wait_license = True
+    if not gcoin.is_license_exist(2):
+        gcoin.create_license(fixed_address, 2)
+        should_wait_license = True
+   
+    if should_wait_license:
+        time.sleep(90)
+    
+    gcoin.mint(7000000000, 1)
+    gcoin.mint(7000000000, 2)
+    
+    time.sleep(90)
+    gcoin.send_to_address(central_bank.address, 1000000000, 1)
+    gcoin.send_to_address(central_bank.address, 1000000000, 2)
 
     print 'CB:', central_bank.address, central_bank.balance
     # print 'Bank.manager.bank_list:', Bank.manager.bank_list
