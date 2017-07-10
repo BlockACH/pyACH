@@ -5,7 +5,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CONTRACT_SERVER_URL = 'http://ach.csie.org:9999'
 
 CLEAN_COLOR = 2
-SMART_CONTRACT_ID = 1
+SMART_CONTRACT_ID = 4
 
 SMART_CONTRACT_PATH = os.path.join(BASE_DIR, 'smart_contract')
 
@@ -14,26 +14,26 @@ SMART_CONTRACT_DB_PATH = os.path.join(DB_PATH, 'smart_contract')
 SETTLE_DB_PATH = os.path.join(DB_PATH, 'settle')
 
 GCOIN_RPC = {
-    'user': 'boolafish',
-    'password': 'abc123',
-    'host': 'ach.csie.org',
-    'port': '1125',
+    'user': '',
+    'password': '',
+    'host': '',
+    'port': '',
 }
 
 AUTHORIZED_BANKS = ['TCH', 'central_bank']
 
 BANK_LIST = [
     # banks for demo
-    'X', 'Y', 'Z',
+    # 'X', 'Y', 'Z',
     # banks from history data
-    #'6AB', 'A28', '46E', 'DD3', '822', 'CCC', '219',
-    #'18C', '170', 'B63', '62F', '5E0', '666', '519',
-    #'BA4', '5BD', '682', 'E07', 'B31', '0B1', 'FCB',
-    #'B89', '101', 'EDB', 'E75', '75D', 'A0D', '22D',
-    #'AB5', 'A1D', 'F73', 'C45', '481', '49A', 'EE0',
-    #'269', '7BA', '48C', 'E0C', 'CE3', '8DA', '552',
-    #'1F6', 'B30', '6D4', 'FB4', '4AD', '940', '838',
-    #'E15', 'F8E', '717', 'C72', '882', 'EA0'
+    '6AB', 'A28', '46E', 'DD3', '822', 'CCC', '219',
+    '18C', '170', 'B63', '62F', '5E0', '666', '519',
+    'BA4', '5BD', '682', 'E07', 'B31', '0B1', 'FCB',
+    'B89', '101', 'EDB', 'E75', '75D', 'A0D', '22D',
+    'AB5', 'A1D', 'F73', 'C45', '481', '49A', 'EE0',
+    '269', '7BA', '48C', 'E0C', 'CE3', '8DA', '552',
+    '1F6', 'B30', '6D4', 'FB4', '4AD', '940', '838',
+    'E15', 'F8E', '717', 'C72', '882', 'EA0'
 ]
 
 BANK_URL = {
