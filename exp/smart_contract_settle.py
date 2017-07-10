@@ -1,10 +1,12 @@
 import time
+import logging
 
 from exp.init_bank import init_bank as gcoin_bank_init
+from smart_contract.utils import DEFAULT_CONTRACT_ID
 from pymongo import MongoClient
 from bank import Bank
 
-CONTRACT_ID = 1
+CONTRACT_ID = DEFAULT_CONTRACT_ID
 
 
 def init_bank():
@@ -42,28 +44,49 @@ def settle():
     query = {
         "$or": [
             {
-                "P_TDATE": current_day
+                "P_TDATE": current_day,
+                "P_TYPE": "R",
+                "P_TXTYPE": "SD",
+            },
+            {
+                "P_TDATE": current_day,
+                "P_TXTYPE": "SC",
             },
             {
                 "P_TDATE": previous_day,
-                "P_TYPE": "N"
+                "P_TYPE": "N",
+                "P_TXTYPE": "SD",
             }
         ]
     }
-
     txs = collection.find(query, no_cursor_timeout=True)
     print 'r size:', txs.count()
+
+    logging.basicConfig(
+        filename='smart_contract_settle_{}_{}.log'.format(
+            previous_day[-4:], current_day[-4:]
+        ),
+        level=logging.DEBUG
+    )
+
+    mem_txs = []
+    for tx in txs:
+        mem_txs.append(tx)
+    astar_mongo.close()
+
     count = 0
     bank_dict = {}
     start = time.time()
 
-    for tx in txs:
+    for tx in mem_txs:
         amount = float(tx['P_AMT'])
 
         p_bank = Bank.manager.get_bank_by_id(str(tx['P_PBANK'][:3]))
         r_bank = Bank.manager.get_bank_by_id(str(tx['P_RBANK'][:3]))
 
-        if count % 1000 == 0:
+        if count % 10000 == 0:
+            logging.info('Tx count: {}'.format(count))
+            logging.info('Took {} seconds.'.format(time.time() - start))
             print '------------- COUNT: {} -------------'.format(count)
             print 'Took {} seconds.'.format(time.time() - start)
             if count > 0:
@@ -72,10 +95,9 @@ def settle():
                     initial_amount = 1000000
                     bank.contract_mint(initial_amount, contract_id=CONTRACT_ID)
                 c = Bank.manager.get_central_bank()
-                c.contract_clear_queue(contract_id=CONTRACT_ID)
+                c.contract_batch_settle(contract_id=CONTRACT_ID)
             print '------------- DONE -------------'
 
-        valid = True
         if tx['P_TDATE'] == previous_day:
             if tx['P_TYPE'] == 'N' and tx['P_TXTYPE'] == 'SD':
                 bank_dict[r_bank.bank_id] = bank_dict.get(r_bank.bank_id, 0) - amount
@@ -83,8 +105,6 @@ def settle():
                 r_bank.contract_send_to(p_bank, amount,
                                         contract_id=CONTRACT_ID,
                                         comment=str(count))
-            else:
-                valid = False
         elif tx['P_TDATE'] == current_day:
             if tx['P_TXTYPE'] == 'SC':
                 bank_dict[r_bank.bank_id] = bank_dict.get(r_bank.bank_id, 0) + amount
@@ -98,18 +118,7 @@ def settle():
                 r_bank.contract_send_to(p_bank, amount,
                                         contract_id=CONTRACT_ID,
                                         comment=str(count))
-            else:
-                valid = False
-        else:
-            valid = False
 
-        if valid:
-            print 'PBANK: {pbank}, RBANK: {rbank}, AMOUNT: {amount}'.format(
-                pbank=p_bank.bank_id,
-                rbank=r_bank.bank_id,
-                amount=amount
-            )
-            count += 1
+        count += 1
 
     print bank_dict
-    astar_mongo.close()
